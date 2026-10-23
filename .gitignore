@@ -1,0 +1,33 @@
+# Recordings, datasets, model weights, and generated reconstruction assets.
+/rosbag/
+/data/
+/AnySplats- V1-result/
+/Workflow/Data/rosbags/
+/Workflow/Data/exports/
+*.bag
+*.db3
+*.db3-shm
+*.db3-wal
+*.mcap
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.ply
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Local Python environments, caches, and credentials.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+.DS_Store
