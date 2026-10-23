@@ -10,9 +10,12 @@ import argparse
 from datetime import datetime, timezone
 import importlib.metadata
 import json
+import math
 from pathlib import Path
 import re
 import shutil
+import sqlite3
+import struct
 import subprocess
 import sys
 
@@ -88,6 +91,74 @@ def new_dataset_name(name):
     return HERE / 'datasets' / name
 
 
+def calibration_parameters(message):
+    """Map ROS OpenCV calibration to COLMAP, retaining all distortion terms."""
+    k, d = message['k'], message['d']
+    width, height = int(message['width']), int(message['height'])
+    if len(k) != 9 or width <= 0 or height <= 0:
+        raise ValueError('Invalid camera matrix or image dimensions')
+    if not all(math.isfinite(float(v)) for v in [*k, *d]) or k[0] <= 0 or k[4] <= 0:
+        raise ValueError('Camera intrinsics contain invalid values')
+    if not (0 <= k[2] < width and 0 <= k[5] < height):
+        raise ValueError('Camera principal point is outside the image; verify cropping/calibration')
+    if abs(k[1]) > 1e-9 or abs(k[3]) > 1e-9:
+        raise ValueError('Skewed camera matrices are unsupported')
+    roi = message.get('roi', {})
+    if message.get('binning_x', 0) not in (0, 1) or message.get('binning_y', 0) not in (0, 1):
+        raise ValueError('Binned calibration needs explicit adjustment before use')
+    if any(roi.get(key, 0) for key in ['x_offset', 'y_offset', 'width', 'height']):
+        raise ValueError('ROI calibration needs explicit adjustment before use')
+    kind = message['distortion_model']
+    if kind == 'plumb_bob' and len(d) == 5:
+        distortion = [*d, 0., 0., 0.]
+    elif kind == 'rational_polynomial' and len(d) == 8:
+        distortion = list(d)
+    else:
+        raise ValueError(f'Unsupported calibrated distortion model: {kind} with {len(d)} coefficients')
+    # ROS/OpenCV integer pixel centres -> COLMAP half-integer pixel centres.
+    params = [k[0], k[4], k[2] + .5, k[5] + .5, *distortion]
+    return {'model': 'FULL_OPENCV', 'width': width, 'height': height, 'params': params,
+            'pixel_convention': 'ROS/OpenCV cx,cy shifted +0.5 for COLMAP', 'fixed': True}
+
+
+def export_calibration(dataset):
+    manifest = json.loads((dataset / 'source_export/manifest.json').read_text())
+    rgb = manifest['rgb_topic'].removesuffix('/compressed')
+    topic = rgb.rsplit('/', 1)[0] + '/camera_info'
+    if topic not in manifest['files']:
+        raise ValueError(f'Calibration topic {topic} not exported; inspect the bag topic names')
+    path = dataset / 'source_export' / manifest['files'][topic]['jsonl']
+    first = None
+    count = 0
+    with path.open() as stream:
+        for line in stream:
+            record = json.loads(line)
+            candidate = calibration_parameters(record['message'])
+            if first is None:
+                first = candidate
+                first['source_message'] = record['message']
+            elif (candidate['width'], candidate['height'], candidate['model']) != (first['width'], first['height'], first['model']) or not all(
+                    math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-9) for a, b in zip(candidate['params'], first['params'])):
+                raise ValueError('Camera calibration varies inside the selected interval; split the recording')
+            count += 1
+    if first is None:
+        raise ValueError('No camera calibration messages in the selected interval')
+    first.update(source_topic=topic, messages_checked=count)
+    save(dataset / 'calibration.json', first)
+    return first
+
+
+def check_calibrated_images(images, calibration):
+    for image in images:
+        with image.open('rb') as stream:
+            header = stream.read(24)
+        if header[:8] != b'\x89PNG\r\n\x1a\n' or len(header) != 24:
+            raise ValueError(f'Invalid PNG: {image}')
+        size = struct.unpack('>II', header[16:24])
+        if size != (calibration['width'], calibration['height']):
+            raise ValueError(f'Image dimensions {size} differ from recorded calibration: {image}')
+
+
 def prepare(args):
     # Resolving a venv's interpreter symlink would bypass pyvenv.cfg and lose its packages.
     python = args.extractor_python.expanduser().absolute()
@@ -108,6 +179,8 @@ def prepare(args):
                '--output', dataset / 'source_export']
     if args.end is not None:
         command += ['--end', str(args.end)]
+    if args.calibrated:
+        command += ['--camera-info']
     metadata['command'] = [str(x) for x in command]
     try:
         logged(command, dataset / 'extraction.log')
@@ -117,6 +190,10 @@ def prepare(args):
         (dataset / 'images').mkdir()
         for image in images:
             shutil.copy2(image, dataset / 'images' / image.name)
+        if args.calibrated:
+            calibration = export_calibration(dataset)
+            check_calibrated_images(images, calibration)
+            metadata['calibration'] = calibration
         metadata.update(status='prepared', image_count=len(images))
     except BaseException as exc:
         metadata.update(status='failed', error=str(exc))
@@ -156,6 +233,24 @@ def run_colmap(args):
         raise ValueError('COLMAP is missing. On Ubuntu: sudo apt install colmap')
     extraction_help = probe([colmap, 'feature_extractor', '-h'])['output']
     matching_help = probe([colmap, 'exhaustive_matcher', '-h'])['output']
+    calibration_path = dataset / 'calibration.json'
+    calibration = json.loads(calibration_path.read_text()) if calibration_path.exists() else None
+    model = 'OPENCV'
+    calibration_options, mapper_options = [], []
+    if calibration:
+        check_calibrated_images(images, calibration)
+        model = calibration['model']
+        calibration_options = ['--ImageReader.camera_params', ','.join(str(x) for x in calibration['params'])]
+        mapper_help = probe([colmap, 'mapper', '-h'])['output']
+        # Older COLMAP also derives absolute-pose refinement from these BA options.
+        for flag in ['--Mapper.ba_refine_focal_length', '--Mapper.ba_refine_principal_point',
+                     '--Mapper.ba_refine_extra_params']:
+            if flag not in mapper_help:
+                raise ValueError(f'Installed COLMAP lacks required fixed-calibration option: {flag}')
+            mapper_options += [flag, '0']
+        for flag in ['--Mapper.abs_pose_refine_focal_length', '--Mapper.abs_pose_refine_extra_params']:
+            if flag in mapper_help:
+                mapper_options += [flag, '0']
     if '--ImageReader.single_camera' in extraction_help:
         camera = ['--ImageReader.single_camera', '1']
     elif '--camera_mode' in extraction_help:
@@ -170,6 +265,7 @@ def run_colmap(args):
     metadata = {'status': 'running', 'environment': environment(),
                 'colmap_version': probe([colmap, '-h']), 'image_count': len(images),
                 'gpu_features': args.gpu, 'min_registered_fraction': args.min_registered_fraction,
+                'calibration': calibration,
                 'commands': []}
     manifest = folder / 'provenance.json'
     save(manifest, metadata)
@@ -180,10 +276,10 @@ def run_colmap(args):
         return logged(command, folder / f'{stage}.log')
     try:
         run('feature_extractor', ['--database_path', folder / 'database.db', '--image_path', dataset / 'images',
-                                 *camera, '--ImageReader.camera_model', 'OPENCV', *extraction_gpu])
+                                 *camera, '--ImageReader.camera_model', model, *calibration_options, *extraction_gpu])
         run('exhaustive_matcher', ['--database_path', folder / 'database.db', *matching_gpu])
         run('mapper', ['--database_path', folder / 'database.db', '--image_path', dataset / 'images',
-                       '--output_path', folder / 'sparse'])
+                       '--output_path', folder / 'sparse', *mapper_options])
         models = sorted(p for p in (folder / 'sparse').iterdir() if p.is_dir())
         if len(models) != 1:
             raise ValueError(f'Found {len(models)} disconnected models. Review coverage/matches before training; see {folder / "sparse"}')
@@ -242,6 +338,62 @@ def train(args):
     print(f'Training finished; outputs and exact software revisions: {folder}')
 
 
+def match_graph(image_ids, pairs, threshold):
+    adjacent = {i: set() for i in image_ids}
+    edges = 0
+    for pair_id, matches in pairs:
+        if matches < threshold:
+            continue
+        a, b = divmod(pair_id, 2147483647)
+        if a in adjacent and b in adjacent:
+            adjacent[a].add(b)
+            adjacent[b].add(a)
+            edges += 1
+    unseen = set(adjacent)
+    components = []
+    while unseen:
+        seed = unseen.pop()
+        pending, component = [seed], [seed]
+        while pending:
+            for node in adjacent[pending.pop()]:
+                if node in unseen:
+                    unseen.remove(node)
+                    component.append(node)
+                    pending.append(node)
+        components.append(component)
+    return {'min_verified_matches': threshold, 'edges': edges,
+            'component_sizes': sorted([len(c) for c in components], reverse=True),
+            'isolated_images': sum(not adjacent[i] for i in adjacent)}
+
+
+def diagnose(args):
+    dataset = args.dataset.expanduser().resolve()
+    database = dataset / 'colmap/database.db'
+    if not database.is_file():
+        raise ValueError(f'Database missing: {database}')
+    with sqlite3.connect(database.as_uri() + '?mode=ro', uri=True) as db:
+        images = list(db.execute('SELECT image_id,name FROM images'))
+        pairs = list(db.execute('SELECT pair_id,rows FROM two_view_geometries WHERE rows>0'))
+        cameras = []
+        for camera_id, model, w, h, blob in db.execute('SELECT camera_id,model,width,height,params FROM cameras'):
+            cameras.append({'camera_id': camera_id, 'model_id': model, 'width': w, 'height': h,
+                            'params': list(struct.unpack('<' + 'd' * (len(blob) // 8), blob))})
+        result = {'images': len(images), 'verified_pairs': len(pairs), 'cameras': cameras,
+                  'graphs': [match_graph([i for i, _ in images], pairs, threshold) for threshold in [15, 30, 100]],
+                  'two_view_config_counts': list(db.execute('SELECT config,COUNT(*) FROM two_view_geometries WHERE rows>0 GROUP BY config'))}
+    for filename, key in [('calibration.json', 'recorded_calibration'), ('colmap/provenance.json', 'colmap_status')]:
+        path = dataset / filename
+        if path.exists():
+            obj = json.loads(path.read_text())
+            result[key] = obj if key == 'recorded_calibration' else {k: obj.get(k) for k in ['status', 'error', 'registered_images']}
+    print(json.dumps(result, indent=2))
+    log = dataset / 'colmap/mapper.log'
+    if log.exists():
+        relevant = [line for line in log.read_text().splitlines() if re.search(
+            r'initial image pair|Initializing|Registering image|Filtered images|Discarding|Failed|ERROR|No good', line, re.IGNORECASE)]
+        print('\nMapper events (last 40):\n' + '\n'.join(relevant[-40:]))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='stage', required=True)
@@ -251,6 +403,7 @@ def main():
     p.add_argument('--start', type=float, default=33)
     p.add_argument('--end', type=float, default=70)
     p.add_argument('--rate', type=float, default=2)
+    p.add_argument('--calibrated', action='store_true', help='Export matching camera_info and use fixed recorded intrinsics in COLMAP')
     p.add_argument('--extractor-python', type=Path, default=PROJECT / 'Workflow/Data/.venv/bin/python')
     p.set_defaults(func=prepare)
     p = commands.add_parser('colmap', help='Estimate poses, screen registration, and undistort images')
@@ -258,6 +411,9 @@ def main():
     p.add_argument('--gpu', action='store_true', help='Use GPU feature extraction/matching; default CPU works over SSH')
     p.add_argument('--min-registered-fraction', type=float, default=.7)
     p.set_defaults(func=run_colmap)
+    p = commands.add_parser('diagnose', help='Inspect camera parameters, verified-match connectivity, and mapper failures')
+    p.add_argument('--dataset', type=Path, required=True)
+    p.set_defaults(func=diagnose)
     p = commands.add_parser('train', help='Launch the separately installed NVIDIA 3DGRUT')
     p.add_argument('--dataset', type=Path, required=True)
     p.add_argument('--tool-dir', type=Path, default=Path.home() / 'tools/3dgrut')

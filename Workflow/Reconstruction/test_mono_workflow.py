@@ -1,10 +1,37 @@
 """Compatibility/error checks for the external COLMAP boundary."""
 import unittest
 
-from mono_workflow import gpu_option, new_dataset_name, registration_count
+from mono_workflow import calibration_parameters, gpu_option, match_graph, new_dataset_name, registration_count
 
 
 class ColmapBoundaryTests(unittest.TestCase):
+    def test_calibrated_plumb_bob_preserves_k3_and_pixel_convention(self):
+        message = {'width': 448, 'height': 448, 'k': [386., 0., 226., 0., 385., 225., 0., 0., 1.],
+                   'd': [-.05, .06, -.0005, .0012, -.02], 'distortion_model': 'plumb_bob'}
+        calibration = calibration_parameters(message)
+        self.assertEqual(calibration['model'], 'FULL_OPENCV')
+        self.assertEqual(calibration['params'], [386., 385., 226.5, 225.5, -.05, .06, -.0005, .0012, -.02, 0., 0., 0.])
+        self.assertTrue(calibration['fixed'])
+
+    def test_roi_and_unknown_distortion_not_silently_misinterpreted(self):
+        message = {'width': 448, 'height': 448, 'k': [386., 0., 226., 0., 385., 225., 0., 0., 1.],
+                   'd': [0.] * 5, 'distortion_model': 'plumb_bob', 'roi': {'x_offset': 10}}
+        with self.assertRaisesRegex(ValueError, 'ROI'):
+            calibration_parameters(message)
+        message['roi'] = {}
+        message['distortion_model'] = 'equidistant'
+        with self.assertRaisesRegex(ValueError, 'Unsupported'):
+            calibration_parameters(message)
+
+    def test_connectivity_counts_weak_bridges_and_isolated_images(self):
+        pairs = [(1 * 2147483647 + 2, 250), (2 * 2147483647 + 3, 20)]
+        loose = match_graph([1, 2, 3, 4], pairs, 15)
+        strong = match_graph([1, 2, 3, 4], pairs, 100)
+        self.assertEqual(loose['component_sizes'], [3, 1])
+        self.assertEqual(loose['isolated_images'], 1)
+        self.assertEqual(strong['component_sizes'], [2, 1, 1])
+        self.assertEqual(strong['isolated_images'], 2)
+
     def test_older_and_newer_gpu_options(self):
         self.assertEqual(gpu_option('--SiftExtraction.use_gpu arg (=1)', 'extract', False),
                          ['--SiftExtraction.use_gpu', '0'])

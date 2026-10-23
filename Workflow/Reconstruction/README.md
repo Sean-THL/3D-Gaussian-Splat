@@ -34,6 +34,33 @@ python3 Workflow/Reconstruction/mono_workflow.py prepare \
 
 This reads the bag from its existing location; another bag copy is unnecessary. It creates `Workflow/Reconstruction/datasets/flight_33_70/` with `images/`, an intact `source_export/` including timestamps and manifest, `extraction.log`, and `preparation.json`.
 
+### Calibrated retry for this RealSense bag
+
+The original baseline estimates intrinsics. If it fails, compare a separate run using the actual cropped-image calibration, keeping the failed run intact:
+
+```bash
+python3 Workflow/Reconstruction/mono_workflow.py prepare \
+  --bag ~/Seans_Project/DASC/Gaussian_Splat/rosbag \
+  --name flight_33_70_calibrated \
+  --start 33 --end 70 --rate 2 --calibrated
+
+python3 Workflow/Reconstruction/mono_workflow.py colmap \
+  --dataset Workflow/Reconstruction/datasets/flight_33_70_calibrated
+```
+
+`--calibrated` exports camera_info and matches its topic to the selected RGB stream. It requires constant, valid calibration matching the PNG dimensions and writes `calibration.json`. COLMAP then uses the recorded intrinsics/distortion and disables intrinsic refinement. ROS/OpenCV principal points are shifted by +0.5 pixels for COLMAP's pixel convention. FULL_OPENCV retains all five plumb_bob coefficients (including k3), with unused denominator terms zero; rational_polynomial with eight coefficients is also supported. Binning/ROI, changing calibration, and unsupported distortion models are rejected rather than silently approximated. Crop-adjusted camera_info from this recording already has a zero ROI.
+
+The included recording has approximately fx=385.97, fy=385.55 pixels at 448×448. The calibrated retry still estimates camera poses from RGB; it does not use Vicon or measured depth, nor guarantee reconstruction success. Initialization also needs valid geometry and sufficient viewpoint overlap. Calibration is an additional input and should be identified when comparing methods.
+
+To inspect a failed run without changing it:
+
+```bash
+python3 Workflow/Reconstruction/mono_workflow.py diagnose \
+  --dataset Workflow/Reconstruction/datasets/flight_33_70
+```
+
+This reports stored camera parameters, connected-component sizes (including isolated images) for verified-pair thresholds of 15, 30, and 100 matches, numeric two-view configuration counts, and recent mapper events. Large pairwise match counts alone do not establish that all views connect or have enough parallax. Thresholds here are diagnostic summaries, not changes to COLMAP's mapping acceptance criteria.
+
 Review `images/` for blur and glare; remove rejected pictures from that dataset copy only. No automatic quality selection is performed. This interval is a comparison baseline, not a guarantee of suitable coverage. Times are relative to the first bag record; `--rate` is the maximum samples/second, with zero exporting every RGB frame. Use another `--name` for each new trial; existing directories are refused. The default extractor Python is `Workflow/Data/.venv/bin/python`; override with `--extractor-python PATH` if needed.
 
 ## 4. Run COLMAP
@@ -97,11 +124,11 @@ Keep the trainer's effective configuration with provenance. A dirty external che
 
 This is an RGB-only baseline. Metric scale, depth/Vicon synchronization, camera-to-body calibration, collision geometry, and version-specific Isaac export remain later work.
 
-Preparation was exercised locally on the real bag. COLMAP and GPU training require remote tools and have not been run locally. Compatibility/error checks:
+Both uncalibrated and calibrated preparation were exercised locally on the real bag. The calibrated interval contained 805 identical RGB calibration messages matching its 71 images. COLMAP and GPU training require remote tools and have not been run locally. Compatibility/error checks:
 
 ```bash
 python3 -m unittest discover -s Workflow/Reconstruction -p 'test_*.py' -v
 python3 Workflow/Reconstruction/mono_workflow.py --help
 ```
 
-References: [NVIDIA mono guide](https://docs.nvidia.com/nurec/robotics/neural_reconstruction_mono.html), [COLMAP CLI](https://colmap.github.io/cli.html), [NVIDIA installation](https://github.com/nv-tlabs/3dgrut#-1-dependencies-and-installation), [MCMC configuration](https://github.com/nv-tlabs/3dgrut/blob/main/configs/strategy/mcmc.yaml).
+References: [NVIDIA mono guide](https://docs.nvidia.com/nurec/robotics/neural_reconstruction_mono.html), [COLMAP CLI](https://colmap.github.io/cli.html), [COLMAP calibration conventions](https://colmap.github.io/faq.html#using-calibration-from-opencv-kalibr-or-other-tools), [NVIDIA installation](https://github.com/nv-tlabs/3dgrut#-1-dependencies-and-installation), [MCMC configuration](https://github.com/nv-tlabs/3dgrut/blob/main/configs/strategy/mcmc.yaml).
