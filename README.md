@@ -6,13 +6,15 @@ ROS bag data preparation, Gaussian reconstruction comparisons, and a workflow to
 
 - `Workflow/Data/`: reusable ROS bag extractor, custom message definitions, tests, and usage documentation.
 - `Workflow/Calibration/`: planned synchronization and camera/body calibration.
-- `Workflow/Reconstruction/`: planned baseline and optimized reconstruction experiments.
+- `Workflow/Reconstruction/`: mono RGB preparation, COLMAP, and an external 3DGRUT training launcher.
 - `Workflow/Evaluation/`: planned image/geometry comparisons and resource measurements.
 - `Workflow/IsaacSim/`: planned visual assets, collision geometry, and simulation validation.
 - `AnySplat/`: existing AnySplat repository, tracked as a submodule pinned to its current commit.
 - `diagnostics/`: reconstruction quality notes and small comparison figures.
 
 Start with [Workflow/Data/README.md](Workflow/Data/README.md).
+
+For the next stage, follow [the mono reconstruction setup](Workflow/Reconstruction/README.md). Keep NVIDIA's `3dgrut` checkout at `~/tools/3dgrut`; keep our workflow code in this repository. Generated reconstruction datasets, caches, logs, and runs are ignored. Each training run records software revisions, the command, and environment in a local `provenance.json`.
 
 ## Clone with AnySplat
 

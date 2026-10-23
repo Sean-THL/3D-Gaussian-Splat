@@ -6,6 +6,6 @@
 4. **Evaluation/** — held-out-view image quality, geometry/pose checks, runtime, memory, and comparisons.
 5. **IsaacSim/** — version-compatible visual USD assets, aligned collision geometry, robot/sensor validation.
 
-Only step 1 is implemented here. Each later folder contains its intended inputs and outputs.
+Step 1 is implemented. Step 3 has a mono RGB dataset preparation helper and launchers for externally installed COLMAP and NVIDIA 3DGRUT. Calibration, evaluation, and Isaac Sim integration remain planned. See [Reconstruction/README.md](Reconstruction/README.md) for setup and current validation scope.
 
 Start with [Data/README.md](Data/README.md). Source recordings remain immutable; each extraction creates a new output directory with a manifest.

@@ -4,6 +4,10 @@
 /AnySplats- V1-result/
 /Workflow/Data/rosbags/
 /Workflow/Data/exports/
+/Workflow/Reconstruction/datasets/
+/Workflow/Reconstruction/runs/
+/Workflow/Reconstruction/cache/
+/Workflow/Reconstruction/logs/
 *.bag
 *.db3
 *.db3-shm
