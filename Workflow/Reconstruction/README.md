@@ -1,5 +1,7 @@
 # Mono RGB baseline: COLMAP → 3DGUT
 
+For the new full-resolution recording, use [the October 25 run instructions](OCT25_RECONSTRUCTION.md). This run targets a Gaussian reconstruction result.
+
 Keep our workflow code in this repository and NVIDIA's software separately at `~/tools/3dgrut`. Datasets, caches, logs, and training runs are excluded from Git. `mono_workflow.py` provides `prepare`, `colmap`, and `train`; it does not install software or modify NVIDIA's code.
 
 ## 1. Get this project on the remote computer
@@ -49,6 +51,8 @@ python3 Workflow/Reconstruction/mono_workflow.py colmap \
 ```
 
 `--calibrated` exports camera_info and matches its topic to the selected RGB stream. It requires constant, valid calibration matching the PNG dimensions and writes `calibration.json`. COLMAP then uses the recorded intrinsics/distortion and disables intrinsic refinement. ROS/OpenCV principal points are shifted by +0.5 pixels for COLMAP's pixel convention. FULL_OPENCV retains all five plumb_bob coefficients (including k3), with unused denominator terms zero; rational_polynomial with eight coefficients is also supported. Binning/ROI, changing calibration, and unsupported distortion models are rejected rather than silently approximated. Crop-adjusted camera_info from this recording already has a zero ROI.
+
+Use `prepare --rgb-topic TOPIC` for another image stream. If image transport and calibration use different namespaces, explicitly pass `--camera-info-topic TOPIC` with `--calibrated`; the selected calibration must match the exported image dimensions. For example, October 25 RGB uses `/camera_full/color/image_raw/compressed`, but its calibration uses `/camera/camera/color/camera_info`.
 
 The included recording has approximately fx=385.97, fy=385.55 pixels at 448×448. The calibrated retry still estimates camera poses from RGB; it does not use Vicon or measured depth, nor guarantee reconstruction success. Initialization also needs valid geometry and sufficient viewpoint overlap. Calibration is an additional input and should be identified when comparing methods.
 

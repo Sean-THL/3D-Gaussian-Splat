@@ -1,5 +1,6 @@
 # Recordings, datasets, model weights, and generated reconstruction assets.
 /rosbag/
+/new_rosbag_10_25/
 /data/
 /AnySplats- V1-result/
 /Workflow/Data/rosbags/

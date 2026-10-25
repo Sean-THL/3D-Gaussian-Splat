@@ -1,10 +1,32 @@
 """Compatibility/error checks for the external COLMAP boundary."""
 import unittest
+import json
+from pathlib import Path
+import tempfile
 
-from mono_workflow import calibration_parameters, gpu_option, match_graph, new_dataset_name, registration_count
+from mono_workflow import calibration_parameters, export_calibration, gpu_option, match_graph, new_dataset_name, registration_count
 
 
 class ColmapBoundaryTests(unittest.TestCase):
+    def test_calibration_namespace_override_for_full_resolution_stream(self):
+        with tempfile.TemporaryDirectory() as folder:
+            dataset = Path(folder)
+            export = dataset / 'source_export'
+            export.mkdir()
+            topic = '/camera/camera/color/camera_info'
+            (export / 'manifest.json').write_text(json.dumps({
+                'rgb_topic': '/camera_full/color/image_raw/compressed',
+                'files': {topic: {'jsonl': 'full_color.jsonl'}}}))
+            message = {'width': 1280, 'height': 720, 'k': [640., 0., 640., 0., 640., 360., 0., 0., 1.],
+                       'd': [0.] * 5, 'distortion_model': 'plumb_bob'}
+            (export / 'full_color.jsonl').write_text(json.dumps({'message': message}) + '\n')
+            with self.assertRaisesRegex(ValueError, 'camera-info-topic'):
+                export_calibration(dataset)
+            result = export_calibration(dataset, topic)
+            self.assertEqual((result['width'], result['height']), (1280, 720))
+            self.assertEqual(result['source_topic'], topic)
+            self.assertEqual(result['params'][2:4], [640.5, 360.5])
+
     def test_calibrated_plumb_bob_preserves_k3_and_pixel_convention(self):
         message = {'width': 448, 'height': 448, 'k': [386., 0., 226., 0., 385., 225., 0., 0., 1.],
                    'd': [-.05, .06, -.0005, .0012, -.02], 'distortion_model': 'plumb_bob'}

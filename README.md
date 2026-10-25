@@ -16,6 +16,8 @@ Start with [Workflow/Data/README.md](Workflow/Data/README.md).
 
 For the next stage, follow [the mono reconstruction setup](Workflow/Reconstruction/README.md). Keep NVIDIA's `3dgrut` checkout at `~/tools/3dgrut`; keep our workflow code in this repository. Generated reconstruction datasets, caches, logs, and runs are ignored. Each training run records software revisions, the command, and environment in a local `provenance.json`.
 
+The new full-resolution recording uses [the October 25 reconstruction instructions](Workflow/Reconstruction/OCT25_RECONSTRUCTION.md): transfer the rosbag to the 4090 host, prepare native RGB with matching calibration, run COLMAP, then train 3DGUT to obtain the Gaussian checkpoint and PLY result.
+
 ## Clone with AnySplat
 
 ```bash

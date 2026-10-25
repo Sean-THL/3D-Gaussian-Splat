@@ -121,12 +121,12 @@ def calibration_parameters(message):
             'pixel_convention': 'ROS/OpenCV cx,cy shifted +0.5 for COLMAP', 'fixed': True}
 
 
-def export_calibration(dataset):
+def export_calibration(dataset, camera_info_topic=None):
     manifest = json.loads((dataset / 'source_export/manifest.json').read_text())
     rgb = manifest['rgb_topic'].removesuffix('/compressed')
-    topic = rgb.rsplit('/', 1)[0] + '/camera_info'
+    topic = camera_info_topic or rgb.rsplit('/', 1)[0] + '/camera_info'
     if topic not in manifest['files']:
-        raise ValueError(f'Calibration topic {topic} not exported; inspect the bag topic names')
+        raise ValueError(f'Calibration topic {topic} not exported; use --camera-info-topic for a different namespace')
     path = dataset / 'source_export' / manifest['files'][topic]['jsonl']
     first = None
     count = 0
@@ -169,6 +169,8 @@ def prepare(args):
         raise ValueError(f'Expected complete ROS 2 bag directory: {bag}')
     if args.start < 0 or args.rate < 0 or (args.end is not None and args.end <= args.start):
         raise ValueError('Invalid time window or image rate')
+    if args.camera_info_topic and not args.calibrated:
+        raise ValueError('--camera-info-topic requires --calibrated')
     dataset = new_dataset_name(args.name)
     dataset.mkdir(parents=True, exist_ok=False)
     metadata = {'status': 'preparing', 'bag': str(bag), 'environment': environment()}
@@ -181,6 +183,8 @@ def prepare(args):
         command += ['--end', str(args.end)]
     if args.calibrated:
         command += ['--camera-info']
+    if args.rgb_topic:
+        command += ['--rgb-topic', args.rgb_topic]
     metadata['command'] = [str(x) for x in command]
     try:
         logged(command, dataset / 'extraction.log')
@@ -191,7 +195,7 @@ def prepare(args):
         for image in images:
             shutil.copy2(image, dataset / 'images' / image.name)
         if args.calibrated:
-            calibration = export_calibration(dataset)
+            calibration = export_calibration(dataset, args.camera_info_topic)
             check_calibrated_images(images, calibration)
             metadata['calibration'] = calibration
         metadata.update(status='prepared', image_count=len(images))
@@ -404,6 +408,8 @@ def main():
     p.add_argument('--end', type=float, default=70)
     p.add_argument('--rate', type=float, default=2)
     p.add_argument('--calibrated', action='store_true', help='Export matching camera_info and use fixed recorded intrinsics in COLMAP')
+    p.add_argument('--rgb-topic', help='RGB image topic override, passed to the bag extractor')
+    p.add_argument('--camera-info-topic', help='Explicit camera_info topic when its namespace differs from the RGB stream')
     p.add_argument('--extractor-python', type=Path, default=PROJECT / 'Workflow/Data/.venv/bin/python')
     p.set_defaults(func=prepare)
     p = commands.add_parser('colmap', help='Estimate poses, screen registration, and undistort images')
