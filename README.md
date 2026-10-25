@@ -14,6 +14,8 @@ ROS bag data preparation, Gaussian reconstruction comparisons, and a workflow to
 
 Start with [Workflow/Data/README.md](Workflow/Data/README.md).
 
+For reusable inputs across methods, follow [Extract once → shared selection → calibrated variants](Workflow/DATASET_WORKFLOW.md). `Workflow/Data/dataset_tools.py` creates selections from an existing export, changes image dimensions with matching intrinsics/depth transformations, and preserves frame identities and reference split lists.
+
 For the next stage, follow [the mono reconstruction setup](Workflow/Reconstruction/README.md). Keep NVIDIA's `3dgrut` checkout at `~/tools/3dgrut`; keep our workflow code in this repository. Generated reconstruction datasets, caches, logs, and runs are ignored. Each training run records software revisions, the command, and environment in a local `provenance.json`.
 
 The new full-resolution recording uses [the October 25 reconstruction instructions](Workflow/Reconstruction/OCT25_RECONSTRUCTION.md): transfer the rosbag to the 4090 host, prepare native RGB with matching calibration, run COLMAP, then train 3DGUT to obtain the Gaussian checkpoint and PLY result.

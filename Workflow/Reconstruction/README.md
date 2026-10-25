@@ -1,5 +1,7 @@
 # Mono RGB baseline: COLMAP → 3DGUT
 
+Preferred for new multi-method experiments: [export once, select shared frames, then derive calibrated variants](../DATASET_WORKFLOW.md). These datasets work with the COLMAP launcher below. `prepare --export PATH` selects from a native export; `prepare --bag PATH` retains the older extraction-plus-preparation behavior.
+
 For the new full-resolution recording, use [the October 25 run instructions](OCT25_RECONSTRUCTION.md). This run targets a Gaussian reconstruction result.
 
 Keep our workflow code in this repository and NVIDIA's software separately at `~/tools/3dgrut`. Datasets, caches, logs, and training runs are excluded from Git. `mono_workflow.py` provides `prepare`, `colmap`, and `train`; it does not install software or modify NVIDIA's code.

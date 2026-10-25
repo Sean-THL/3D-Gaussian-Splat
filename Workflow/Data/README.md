@@ -1,5 +1,7 @@
 # Extract data from a rosbag
 
+For multiple reconstruction methods, use [the reusable dataset workflow](../DATASET_WORKFLOW.md): export native data once, then run `dataset_tools.py select` and `dataset_tools.py variant`. The new tool adjusts intrinsics with resizing/cropping, optionally associates aligned measured depth with explicit timestamp tolerances, and records frame IDs/reference splits. It uses this folder's existing `.venv` and requirements.
+
 This folder contains the copied flight bag, `extract_rosbag.py`, and the message definitions needed to decode its PX4 topics. The original `Gaussian_Splat/rosbag` is unchanged.
 
 The extractor streams messages on the CPU. No ROS installation, GPU, ROS replay, or AnySplat environment is required. It reads ROS 2 SQLite/MCAP bags supported by Rosbags; provide the complete bag directory, including metadata and all split files. This recording's SQLite format was tested.

@@ -121,13 +121,13 @@ def calibration_parameters(message):
             'pixel_convention': 'ROS/OpenCV cx,cy shifted +0.5 for COLMAP', 'fixed': True}
 
 
-def export_calibration(dataset, camera_info_topic=None):
-    manifest = json.loads((dataset / 'source_export/manifest.json').read_text())
+def read_export_calibration(export, camera_info_topic=None):
+    manifest = json.loads((export / 'manifest.json').read_text())
     rgb = manifest['rgb_topic'].removesuffix('/compressed')
     topic = camera_info_topic or rgb.rsplit('/', 1)[0] + '/camera_info'
     if topic not in manifest['files']:
         raise ValueError(f'Calibration topic {topic} not exported; use --camera-info-topic for a different namespace')
-    path = dataset / 'source_export' / manifest['files'][topic]['jsonl']
+    path = export / manifest['files'][topic]['jsonl']
     first = None
     count = 0
     with path.open() as stream:
@@ -144,8 +144,13 @@ def export_calibration(dataset, camera_info_topic=None):
     if first is None:
         raise ValueError('No camera calibration messages in the selected interval')
     first.update(source_topic=topic, messages_checked=count)
-    save(dataset / 'calibration.json', first)
     return first
+
+
+def export_calibration(dataset, camera_info_topic=None):
+    calibration = read_export_calibration(dataset / 'source_export', camera_info_topic)
+    save(dataset / 'calibration.json', calibration)
+    return calibration
 
 
 def check_calibrated_images(images, calibration):
@@ -164,6 +169,20 @@ def prepare(args):
     python = args.extractor_python.expanduser().absolute()
     if not python.is_file():
         raise ValueError('Set up Workflow/Data/.venv first, or pass --extractor-python')
+    if args.export is not None:
+        command = [str(python), str(PROJECT / 'Workflow/Data/dataset_tools.py'), 'select',
+                   '--export', str(args.export.expanduser().resolve()), '--name', args.name,
+                   '--start', str(args.start), '--rate', str(args.rate)]
+        if args.end is not None:
+            command += ['--end', str(args.end)]
+        if args.camera_info_topic:
+            command += ['--camera-info-topic', args.camera_info_topic]
+        if args.rgb_topic:
+            manifest = json.loads((args.export.expanduser() / 'manifest.json').read_text())
+            if manifest.get('rgb_topic') != args.rgb_topic:
+                raise ValueError('--rgb-topic differs from the stream in this export; choose the matching export')
+        subprocess.run(command, check=True)
+        return
     bag = args.bag.expanduser().resolve()
     if not (bag / 'metadata.yaml').is_file():
         raise ValueError(f'Expected complete ROS 2 bag directory: {bag}')
@@ -330,6 +349,12 @@ def train(args):
                f'strategy.add.max_n_gaussians={args.max_gaussians}', 'export_ply.enabled=true']
     metadata = {'status': 'running', 'environment': environment(tool), 'dataset': str(dataset),
                 'command': command, 'colmap_provenance': json.loads(provenance.read_text())}
+    for name in ['dataset.json', 'splits.json', 'calibration.json']:
+        if (dataset / name).is_file():
+            metadata[name] = json.loads((dataset / name).read_text())
+    if 'splits.json' in metadata:
+        metadata['split_policy'] = 'Reference split recorded; external trainer uses its own split. Audit actual lists before comparison.'
+        print('Reference split recorded in provenance; NVIDIA split selection is not overridden by this launcher.')
     save(folder / 'provenance.json', metadata)
     try:
         logged(command, folder / 'training.log', tool)
@@ -402,7 +427,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='stage', required=True)
     p = commands.add_parser('prepare', help='Extract a fresh RGB dataset from a ROS 2 bag')
-    p.add_argument('--bag', type=Path, required=True)
+    source = p.add_mutually_exclusive_group(required=True)
+    source.add_argument('--bag', type=Path, help='Legacy convenience mode: extract directly from a bag')
+    source.add_argument('--export', type=Path, help='Reuse existing native export; no bag decoding')
     p.add_argument('--name', required=True)
     p.add_argument('--start', type=float, default=33)
     p.add_argument('--end', type=float, default=70)
