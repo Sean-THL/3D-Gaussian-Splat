@@ -18,6 +18,7 @@ import sqlite3
 import struct
 import subprocess
 import sys
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
@@ -325,6 +326,51 @@ def run_colmap(args):
     print(f'Training data: {dataset / "undistorted"}')
 
 
+def training_layout(root, factor):
+    """Adapt COLMAP's undistorted output without changing its full-size calibration."""
+    sparse = root / 'sparse'
+    names = ['cameras', 'images', 'points3D']
+    for extension in ['bin', 'txt']:
+        if all((sparse / '0' / f'{name}.{extension}').is_file() for name in names):
+            break
+        if all((sparse / f'{name}.{extension}').is_file() for name in names):
+            (sparse / '0').mkdir(exist_ok=True)
+            for name in names:
+                shutil.copy2(sparse / f'{name}.{extension}', sparse / '0' / f'{name}.{extension}')
+            break
+    else:
+        raise ValueError(f'Complete undistorted sparse model missing: {sparse}')
+    if factor == 1:
+        return
+    from PIL import Image
+    source = root / 'images'
+    images = sorted(p for p in source.rglob('*') if p.is_file())
+    if not images:
+        raise ValueError('Undistorted image folder is empty')
+    signature = {'factor': factor, 'sources': [
+        [str(p.relative_to(source)), p.stat().st_size, p.stat().st_mtime_ns] for p in images]}
+    target = root / f'images_{factor}'
+    marker = root / f'images_{factor}.json'
+    if target.exists():
+        if marker.is_file() and json.loads(marker.read_text()) == signature and all(
+                (target / p.relative_to(source)).is_file() for p in images):
+            return
+        raise ValueError(f'Existing pyramid is incomplete or stale: {target}; move it aside before retrying')
+    with tempfile.TemporaryDirectory(prefix='pyramid_', dir=root) as temporary:
+        staging = Path(temporary) / 'images'
+        staging.mkdir()
+        for path in images:
+            output = staging / path.relative_to(source)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with Image.open(path) as image:
+                size = (image.width // factor, image.height // factor)
+                if min(size) < 1:
+                    raise ValueError(f'Image too small for factor {factor}: {path}')
+                image.resize(size, Image.Resampling.LANCZOS).save(output)
+        staging.rename(target)
+    save(marker, signature)
+
+
 def train(args):
     dataset = args.dataset.expanduser().resolve()
     tool = args.tool_dir.expanduser().resolve()
@@ -335,18 +381,26 @@ def train(args):
         raise ValueError('Complete the COLMAP stage successfully before training')
     if not (dataset / 'undistorted/images').is_dir():
         raise ValueError('Undistorted images are missing')
-    if args.max_gaussians < 1 or args.workers < 0:
-        raise ValueError('Invalid Gaussian limit or worker count')
+    if args.max_gaussians < 1 or args.workers < 0 or args.iterations < 1:
+        raise ValueError('Invalid Gaussian limit, worker count, or iteration count')
     cuda = probe([sys.executable, '-c', 'import torch; assert torch.cuda.is_available(), "CUDA is unavailable"'])
     if cuda['returncode'] != 0:
         raise ValueError('Activate the installed 3dgrut environment first. ' + cuda['output'])
+    training_layout(dataset / 'undistorted', args.downsample_factor)
     run_name = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')
     folder = HERE / 'runs' / f'{dataset.name}_{run_name}'
     folder.mkdir(parents=True, exist_ok=False)
+    checkpoints = sorted({args.iterations, *([7000] if args.iterations > 7000 else [])})
+    checkpoint_list = '[' + ','.join(map(str, checkpoints)) + ']'
     command = [sys.executable, 'train.py', '--config-name', 'apps/colmap_3dgut_mcmc.yaml',
                f'path={dataset / "undistorted"}', f'out_dir={folder / "model"}',
                f'experiment_name={dataset.name}', f'num_workers={args.workers}',
-               f'strategy.add.max_n_gaussians={args.max_gaussians}', 'export_ply.enabled=true']
+               f'strategy.add.max_n_gaussians={args.max_gaussians}', 'export_ply.enabled=true',
+               f'dataset.downsample_factor={args.downsample_factor}',
+               'dataset.gsplat_image_downscale=true', f'n_iterations={args.iterations}',
+               f'checkpoint.iterations={checkpoint_list}']
+    if args.smoke_test:
+        command.extend(['test_last=false', 'compute_extra_metrics=false'])
     metadata = {'status': 'running', 'environment': environment(tool), 'dataset': str(dataset),
                 'command': command, 'colmap_provenance': json.loads(provenance.read_text())}
     for name in ['dataset.json', 'splits.json', 'calibration.json']:
@@ -452,6 +506,10 @@ def main():
     p.add_argument('--tool-dir', type=Path, default=Path.home() / 'tools/3dgrut')
     p.add_argument('--max-gaussians', type=int, default=500000)
     p.add_argument('--workers', type=int, default=2)
+    p.add_argument('--downsample-factor', type=int, choices=[1, 2, 4, 8], default=1,
+                   help='Create an undistorted image pyramid; NVIDIA scales intrinsics when loading')
+    p.add_argument('--iterations', type=int, default=30000)
+    p.add_argument('--smoke-test', action='store_true', help='Skip final evaluation for a short installation/memory check')
     p.set_defaults(func=train)
     args = parser.parse_args()
     try:

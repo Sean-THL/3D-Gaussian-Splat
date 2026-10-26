@@ -126,6 +126,26 @@ Training uses the active Python environment. The helper checks CUDA access and s
 
 Keep the trainer's effective configuration with provenance. A dirty external checkout is recorded but not copied; commit external modifications separately before relying on the SHA for reproducibility. Run AnySplat, Gaussian training, and Isaac Sim separately. Monitor memory with `watch -n 1 nvidia-smi`; limits are starting choices, not an out-of-memory guarantee.
 
+## Local 8 GB GPU trial
+
+Reuse the successful COLMAP dataset; there is no need to extract the bag or estimate poses again. Copy both `colmap/` (including `provenance.json`) and `undistorted/` from the remote dataset into the same local dataset folder.
+
+With NVIDIA 3DGRUT installed at `~/tools/3dgrut`, first run a short installation and memory check:
+
+```bash
+cd ~/Seans_Project/DASC/Gaussian_Splat
+source ~/tools/3dgrut/.venv/bin/activate
+MAX_JOBS=1 CMAKE_BUILD_PARALLEL_LEVEL=1 \
+python Workflow/Reconstruction/mono_workflow.py train \
+  --dataset Workflow/Reconstruction/datasets/flight_20261025_native \
+  --workers 0 --max-gaussians 100000 --downsample-factor 2 \
+  --iterations 200 --smoke-test
+```
+
+This creates `undistorted/images_2/` from the undistorted images and copies the sparse model into `sparse/0/` if COLMAP exported it directly under `sparse/`. Original images and camera files are preserved. NVIDIA's loader applies the resolution change to the intrinsics at load time. For example, a 1280×720 image becomes 640×360 and its focal lengths and principal point coordinates are divided by two. Do not manually halve the stored camera parameters as well.
+
+The 200-step run only checks that training works; it is not a reconstruction quality test. If it succeeds with sufficient memory available, rerun without `--iterations 200 --smoke-test` for the default 30,000 iterations and final evaluation. Each command starts a separate run. The Gaussian limit constrains growth; inspect initial point counts and actual peak GPU/RAM use rather than assuming that this setting guarantees a fit. `--downsample-factor 4` is available if half-resolution still exceeds memory.
+
 ## Scope and checks
 
 This is an RGB-only baseline. Metric scale, depth/Vicon synchronization, camera-to-body calibration, collision geometry, and version-specific Isaac export remain later work.

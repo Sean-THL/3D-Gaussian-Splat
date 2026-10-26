@@ -4,10 +4,35 @@ import json
 from pathlib import Path
 import tempfile
 
-from mono_workflow import calibration_parameters, export_calibration, gpu_option, match_graph, new_dataset_name, registration_count
+from mono_workflow import calibration_parameters, export_calibration, gpu_option, match_graph, new_dataset_name, registration_count, training_layout
 
 
 class ColmapBoundaryTests(unittest.TestCase):
+    def test_training_layout_preserves_calibration_and_resizes_undistorted_images(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'sparse').mkdir()
+            for name in ['cameras', 'images', 'points3D']:
+                (root / 'sparse' / f'{name}.bin').write_bytes(b'original model')
+            (root / 'images').mkdir()
+            Image.new('RGB', (17, 11)).save(root / 'images/frame.png')
+            training_layout(root, 2)
+            self.assertEqual((root / 'sparse/0/cameras.bin').read_bytes(), b'original model')
+            with Image.open(root / 'images_2/frame.png') as image:
+                self.assertEqual(image.size, (8, 5))
+            with Image.open(root / 'images/frame.png') as image:
+                self.assertEqual(image.size, (17, 11))
+            training_layout(root, 2)  # Reuse only a matching, complete pyramid.
+            (root / 'images_2/frame.png').unlink()
+            with self.assertRaisesRegex(ValueError, 'incomplete or stale'):
+                training_layout(root, 2)
+
+    def test_training_layout_rejects_missing_model(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaisesRegex(ValueError, 'sparse model missing'):
+                training_layout(Path(folder), 1)
+
     def test_calibration_namespace_override_for_full_resolution_stream(self):
         with tempfile.TemporaryDirectory() as folder:
             dataset = Path(folder)
