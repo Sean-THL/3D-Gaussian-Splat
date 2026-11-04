@@ -19,6 +19,8 @@ def main():
     parser.add_argument('--gui', action='store_true', help='Requires a desktop display; default is headless')
     parser.add_argument('--steps', type=int, default=240)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--experience', type=Path,
+                        help='Override the modern Isaac Python .kit experience')
     args = parser.parse_args()
     if args.steps < 180:
         parser.error('Use at least 180 steps to allow floor contact to settle')
@@ -30,6 +32,11 @@ def main():
     version = version_path.read_text().strip() if version_path.is_file() else 'unknown'
     if version != 'unknown' and not version.startswith('4.5.'):
         parser.error(f'This first test targets the installed 4.5 release, found {version}')
+    experience = args.experience or isaac_root/'apps/isaacsim.exp.base.python.kit'
+    experience = experience.expanduser().resolve()
+    if not experience.is_file():
+        parser.error(f'Modern Python experience missing: {experience}. '
+                     'Locate isaacsim.exp.base.python.kit and pass --experience PATH.')
     output = args.output or root/'data/scene_20261025_200034/isaac_sim'/(
         'smoke_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ'))
     output = output.resolve()
@@ -37,14 +44,22 @@ def main():
     report_path = output/'report.json'
     report = dict(status='starting', isaac_version=version, isaac_root=str(isaac_root),
                   platform=platform.platform(), python=sys.version, headless=not args.gui,
-                  steps_requested=args.steps, physics_dt_s=1/60, external_assets_required=False)
+                  steps_requested=args.steps, physics_dt_s=1/60, external_assets_required=False,
+                  experience=str(experience), phase='prepared')
     report_path.write_text(json.dumps(report, indent=2)+'\n')
     print(f'ISAAC_SMOKE_OUTPUT={output}', flush=True)
     application = None
     world = None
+    def phase(name):
+        report['phase'] = name
+        report_path.write_text(json.dumps(report, indent=2)+'\n')
+        print(f'ISAAC_SMOKE_PHASE={name}', flush=True)
     try:
+        phase('starting_kit')
         from isaacsim import SimulationApp
-        application = SimulationApp({'headless': not args.gui, 'width': 640, 'height': 480})
+        application = SimulationApp({'headless': not args.gui, 'width': 640, 'height': 480},
+                                    experience=str(experience))
+        phase('app_ready')
 
         # Kit-dependent modules must be imported after SimulationApp is created.
         import numpy as np
@@ -52,9 +67,11 @@ def main():
         from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
         from pxr import UsdGeom, UsdLux
 
+        phase('creating_world')
         world = World(stage_units_in_meters=1., physics_dt=1/60, rendering_dt=1/60, backend='numpy')
         UsdGeom.SetStageUpAxis(world.stage, UsdGeom.Tokens.z)
         world.get_physics_context().set_gravity(-9.81)
+        phase('creating_bodies')
         # Procedural primitives avoid Nucleus/remote asset downloads.
         world.scene.add(FixedCuboid(prim_path='/World/Ground', name='floor',
             position=np.array([0., 0., -.05]), scale=np.array([4., 4., .1]),
@@ -63,8 +80,10 @@ def main():
             position=np.array([0., 0., 1.5]), scale=np.array([.2, .2, .2]),
             size=1., mass=.2, color=np.array([.2, .75, .65])))
         UsdLux.DomeLight.Define(world.stage, '/World/Light').CreateIntensityAttr(800.)
+        phase('resetting_physics')
         world.reset()
         world.play()
+        phase('stepping_physics')
         initial_position = np.asarray(cube.get_world_pose()[0]).copy()
         samples = []
         for step in range(args.steps):
@@ -97,11 +116,13 @@ def main():
                       final_velocity_m_s=final_velocity.tolist(), simulated_seconds=args.steps/60,
                       stage_up_axis=str(UsdGeom.GetStageUpAxis(world.stage)),
                       stage_metres_per_unit=float(UsdGeom.GetStageMetersPerUnit(world.stage)))
+        phase('finished')
         print('ISAAC_SMOKE_RESULT='+json.dumps(report), flush=True)
     except Exception as error:
         report.update(status='failed', error=f'{type(error).__name__}: {error}')
         import traceback
         traceback.print_exc()
+        print('ISAAC_SMOKE_RESULT='+json.dumps(report), flush=True)
     finally:
         report_path.write_text(json.dumps(report, indent=2)+'\n')
         if world is not None:

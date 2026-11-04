@@ -79,6 +79,19 @@ If another Conda environment is still active, deactivate it as well. The wrapper
 
 The test creates only procedural USD primitives, so no room assets or dataset transfers are needed. It simulates 240 physics steps (4 seconds) and checks that a 20 cm cube drops from Z=1.5 m, rests with its centre near Z=0.1 m on the floor, and settles without passing through the floor. It prints `ISAAC_SMOKE_RESULT=...` and saves `report.json`, `trajectory.csv`, and `smoke_scene.usda` under `data/scene_20261025_200034/isaac_sim/smoke_TIMESTAMP/`. First application startup can take longer than the four simulated seconds. Return the final result or the terminal error if startup fails; do not treat syntax checks as a successful native runtime test.
 
+The user subsequently reported that Isaac 4.5 reaches `app ready`. The excerpt contains startup warnings but no `PHYSICS` samples or final result, so the physics test is still unverified. The code already uses modern imports (`isaacsim`, `isaacsim.core.api`, and `isaacsim.core.api.objects`). It does not import the deprecated `omni.isaac.asset_browser` extension. That extension can be loaded transitively by the installed application's startup dependencies; switching an import in our script cannot guarantee removal of a vendor dependency warning.
+
+The launcher now explicitly selects `apps/isaacsim.exp.base.python.kit` rather than leaving experience selection to the default compatibility search. A custom location can be supplied with `--experience /path/to/isaacsim.exp.base.python.kit`. Progress is printed and saved in `report.json` as `ISAAC_SMOKE_PHASE=starting_kit`, `app_ready`, `creating_world`, `creating_bodies`, `resetting_physics`, `stepping_physics`, and `finished`. These markers identify where startup/physics is taking time. Warnings are not suppressed and installed extension files are not edited. The reported TLAS warning sequence itself ends with a valid adjusted limit; it is not evidence of a failed contact simulation.
+
+To retain all startup output while preserving the script's failure status:
+
+```bash
+set -o pipefail
+bash Workflow/Simulation/isaac_sim/run_smoke_test.sh 2>&1 | tee /tmp/dasc_isaac_smoke.log
+```
+
+If it does not finish, provide the last `ISAAC_SMOKE_PHASE` and the subsequent error/traceback, not just an earlier deprecation notice. The installed 4.5 extension renaming is documented in [NVIDIA's migration guide](https://docs.isaacsim.omniverse.nvidia.com/latest/migration_guides/isaac_sim_4_5/extensions_renaming.html).
+
 `--gui` is optional only from an actual desktop/display session. Keep the default headless mode over plain SSH. Once this test passes, move to the native drone stage below.
 
 ## 4. Build a drone scene with native rigid-body dynamics
