@@ -4,9 +4,9 @@
 2. **Calibration/** — timestamp association, intrinsics, camera-to-body extrinsics, and frame conventions.
 3. **Reconstruction/** — AnySplat baselines and later optimized Gaussian reconstruction.
 4. **Evaluation/** — held-out-view image quality, geometry/pose checks, runtime, memory, and comparisons.
-5. **IsaacSim/** — version-compatible visual USD assets, aligned collision geometry, robot/sensor validation.
+5. **[Simulation/](Simulation/README.md)** — runnable FiGS-style prototype with native 3DGUT rendering, M-route tracking, browser controls, and video/telemetry export. MPC integration remains planned.
 
-Step 1 is implemented. Step 3 has a mono RGB dataset preparation helper and launchers for externally installed COLMAP and NVIDIA 3DGRUT. Calibration, evaluation, and Isaac Sim integration remain planned. See [Reconstruction/README.md](Reconstruction/README.md) for setup and current validation scope.
+Data extraction and dataset selection are implemented. Reconstruction has a mono RGB dataset preparation helper and launchers for externally installed COLMAP and NVIDIA 3DGRUT. Evaluation includes a native 3DGUT depth comparison for the October 25 scene. Calibration includes a candidate COLMAP-to-Vicon trajectory alignment with estimated fixed mounting transform and timing offset; independent physical validation remains outstanding. The simulator prototype is runnable with `Workflow/Simulation/run.sh`; it uses our lightweight model and baseline controller rather than the full upstream FiGS/ACADOS stack. See the workflow guides for usage and limitations.
 
 Start with [Data/README.md](Data/README.md). Source recordings remain immutable; each extraction creates a new output directory with a manifest.
 

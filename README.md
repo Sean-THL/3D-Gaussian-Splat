@@ -1,14 +1,14 @@
 # 3D Gaussian Splat
 
-ROS bag data preparation, Gaussian reconstruction comparisons, and a workflow toward Isaac Sim integration.
+ROS bag data preparation, Gaussian reconstruction comparisons, and a workflow toward FiGS-based drone simulation.
 
 ## Project layout
 
 - `Workflow/Data/`: reusable ROS bag extractor, custom message definitions, tests, and usage documentation.
-- `Workflow/Calibration/`: planned synchronization and camera/body calibration.
+- `Workflow/Calibration/`: candidate COLMAP/Vicon alignment with estimated camera mounting transform and timing offset; independent physical validation remains outstanding.
 - `Workflow/Reconstruction/`: mono RGB preparation, COLMAP, and an external 3DGRUT training launcher.
-- `Workflow/Evaluation/`: planned image/geometry comparisons and resource measurements.
-- `Workflow/IsaacSim/`: planned visual assets, collision geometry, and simulation validation.
+- `Workflow/Evaluation/`: native 3DGUT depth comparison; broader image/geometry comparisons and resource measurements remain planned.
+- `Workflow/Simulation/`: runnable FiGS-style flight simulator with native 3DGUT camera rendering, M-route tracking, browser controls, and video/telemetry export. Start with [the simulation guide](Workflow/Simulation/README.md).
 - `AnySplat/`: existing AnySplat repository, tracked as a submodule pinned to its current commit.
 - `diagnostics/`: reconstruction quality notes and small comparison figures.
 

@@ -1,0 +1,49 @@
+{
+  "name": "October 25 M-route prototype",
+  "backend": "figs_style_3dgut",
+  "frame_convention": "Vicon world Z-up; virtual body right-handed X-forward Y-left Z-up. Candidate marker-camera mount is used as the virtual body-camera mount until independently measured.",
+  "physics_hz": 100,
+  "control_hz": 20,
+  "render_hz": 10,
+  "seed": 42,
+  "vehicle": {
+    "mass_kg": 0.85,
+    "gravity_m_s2": 9.81,
+    "linear_drag_per_s": 0.15,
+    "max_thrust_to_weight": 2.5,
+    "max_body_rate_rad_s": 4.0,
+    "floor_z_m": 0.0
+  },
+  "controller": {
+    "position_gain": 4.0,
+    "velocity_gain": 3.2,
+    "attitude_gain": 12.0,
+    "max_acceleration_m_s2": 2.0
+  },
+  "task": {
+    "center_xy_m": [0.0, 0.0],
+    "width_m": 0.6,
+    "height_m": 0.6,
+    "altitude_m": 1.2,
+    "speed_m_s": 0.3,
+    "max_acceleration_m_s2": 0.5,
+    "yaw_deg": 0.0,
+    "hover_seconds": 1.0
+  },
+  "rendering": {
+    "tool_dir": "~/tools/3dgrut",
+    "width": 640,
+    "height": 360,
+    "alignment": "data/scene_20261025_200034/calibration/alignment_20261103T220923_264755Z/alignment.json",
+    "mount_override": null,
+    "checkpoint": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/ckpt_last.pt",
+    "camera_model": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/datasets/flight_20261025_native/undistorted/sparse/0/cameras.bin"
+  },
+  "limitations": [
+    "Prototype vehicle parameters; not identified hardware dynamics.",
+    "Estimated marker-camera mount applied to virtual body axes; measured body/marker/camera transforms can replace it.",
+    "Only an assumed floor plane at Z=0 is enforced. Scene obstacles are visual, not collidable.",
+    "Baseline tracking controller; upstream FiGS/ACADOS MPC and a learned student are not integrated.",
+    "No PX4, ROS, or real-drone command interface."
+  ]
+}
