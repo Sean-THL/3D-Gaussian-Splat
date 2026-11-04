@@ -94,6 +94,22 @@ If it does not finish, provide the last `ISAAC_SMOKE_PHASE` and the subsequent e
 
 `--gui` is optional only from an actual desktop/display session. Keep the default headless mode over plain SSH. Once this test passes, move to the native drone stage below.
 
+### See the falling cube in the existing WebRTC editor
+
+The standalone smoke test and the full streaming editor are separate application processes. Starting `~/isaacsim/isaac-sim.streaming.sh` opens an editor; it does not automatically load our test scene. The standalone test exits when its checks finish, so it is not the application to use for a persistent streamed demonstration.
+
+`drop_demo.py` is an editor-native alternative. It creates a new demo stage, sets the viewport camera, adds a procedural floor and dynamic cube, and starts native physics while leaving the streaming application open. Save an existing scene before running it because the demo replaces the current stage. It uses current `isaacsim.core.utils` and USD physics APIs and does not instantiate another `SimulationApp`.
+
+1. Pull the latest code in a separate terminal on the remote laptop, leaving the streaming application running.
+2. In the streamed Isaac editor, open **Window > Script Editor**.
+3. Paste and run:
+
+```python
+exec(open('/home/tk/Seans_Project/DASC/3D-Gaussian-Splat/Workflow/Simulation/isaac_sim/drop_demo.py').read())
+```
+
+The view should frame the turquoise cube above a dark floor, then start dropping it after a short delay. Click **Stop**, then **Play** in the main timeline to repeat. The code is syntax-checked locally; visual/physics execution in the remote editor still requires confirmation. This interactive demonstration is separate from the automated smoke test's pass/fail report.
+
 ## 4. Build a drone scene with native rigid-body dynamics
 
 Create a simple drone rigid body with mass, inertia, four rotor locations, and an attached camera. Begin with explicit provisional dimensions/offsets in configuration, replaceable with measured values. Add a known floor and simple room/obstacle proxy shapes as separate collision geometry. Keep assumed geometry labeled until surveyed.
@@ -120,6 +136,7 @@ Next add MPC only after the dynamics/sensor loop works. ROS 2/PX4 and student tr
 | --- | --- |
 | `inspect_host.sh` | Implemented read-only host inventory |
 | `smoke_test.py`, `run_smoke_test.sh` | Implemented for 4.5; native execution awaiting remote test |
+| `drop_demo.py` | Implemented editor-native falling-cube demo for the already-running stream; remote visualization awaiting confirmation |
 | `build_scene.py` | Planned: native stage, drone/camera, collision proxies, visual scene |
 | `run_quadrotor.py` | Planned: dynamics/controller/sensor loop |
 | `../configs/isaac_*.json` | Planned: version, assets, dynamics, and mount settings |
