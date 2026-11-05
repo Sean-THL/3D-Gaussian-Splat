@@ -15,10 +15,57 @@ from Workflow.Simulation.rendering.assets import resolve_training_asset
 
 
 CONFIG = json.loads((Path(__file__).parent/'configs/demo.json').read_text())
+CONFIG['controller']['type'] = 'baseline'
 CONFIG['dynamics_model'] = 'quadrotor'  # Keep regression coverage for the original model.
 
 
 class SimulationTests(unittest.TestCase):
+    def test_yaw_modes_match_tangent_and_derivative(self):
+        for shape in ['m', 'horizontal_circle', 'lissajous_figure8']:
+            task = {**CONFIG['task'], 'trajectory_type': shape, 'yaw_deg': 20.}
+            constant = make_trajectory(task)
+            for t in [0., 2., constant.duration+1]:
+                np.testing.assert_allclose(constant.yaw_reference(t), [np.deg2rad(20.), 0.])
+            aligned = make_trajectory({**task, 'yaw_mode': 'velocity_aligned'})
+            for t in np.linspace(.01, aligned.duration-.01, 180):
+                yaw, rate = aligned.yaw_reference(t)
+                self.assertAlmostEqual(aligned.trajectory_function(t)[9], yaw)
+                numerical = (aligned.yaw_reference(t+1e-5)[0]-aligned.yaw_reference(t-1e-5)[0])/2e-5
+                self.assertAlmostEqual(rate, numerical, places=5)
+                velocity = aligned.sample(t)[1]
+                # M corners intentionally blend rather than demand an instant yaw jump.
+                near_corner = shape == 'm' and min(abs(t-aligned.hold-e) for e in aligned.edges[1:-1]) <= .5
+                if np.linalg.norm(velocity[:2]) > 1e-5 and not near_corner:
+                    error = yaw-np.deg2rad(20.)-np.arctan2(velocity[1], velocity[0])
+                    self.assertAlmostEqual(np.sin(error), 0., places=7)
+                    self.assertGreater(np.cos(error), .999999)
+            self.assertTrue(np.isfinite(aligned.yaw_reference(0.)).all())
+            self.assertTrue(np.isfinite(aligned.yaw_reference(aligned.duration)).all())
+
+    def test_velocity_yaw_tracks_on_all_models_and_holds(self):
+        for model in ['single_integrator', 'double_integrator', 'quadrotor']:
+            config = copy.deepcopy(CONFIG)
+            config['dynamics_model'] = model
+            config['task'].update(trajectory_type='horizontal_circle', yaw_mode='velocity_aligned')
+            sim = Simulator(config)
+            sim.command({'action': 'play'})
+            for _ in range(240):
+                sim.advance()
+            yaw = sim.state.orientation.as_euler('xyz')[2]
+            error = yaw-sim.yaw_reference()[0]
+            self.assertLess(abs(np.arctan2(np.sin(error), np.cos(error))), .06)
+            self.assertGreater(abs(yaw-np.pi/2), .1)
+            sim.command({'action': 'hover'})
+            target = sim.yaw_reference()
+            for _ in range(20):
+                sim.advance()
+            self.assertEqual(sim.yaw_reference(), target)
+            self.assertEqual(target[1], 0.)
+            sim.command({'action': 'configure', 'task': {'yaw_mode': 'constant', 'yaw_deg': -30.}})
+            self.assertAlmostEqual(sim.yaw_reference()[0], -np.pi/6)
+            with self.assertRaises(ValueError):
+                sim.command({'action': 'configure', 'task': {'yaw_mode': 'unknown'}})
+
     def test_integrator_constant_inputs(self):
         state = State(np.array([0., 0., 2.]), np.array([.1, 0., 0.]), Rotation.identity())
         for model in ['single_integrator', 'double_integrator']:

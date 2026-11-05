@@ -20,7 +20,8 @@
     "position_gain": 4.0,
     "velocity_gain": 3.2,
     "attitude_gain": 12.0,
-    "max_acceleration_m_s2": 2.0
+    "max_acceleration_m_s2": 2.0,
+    "type": "mpc"
   },
   "task": {
     "trajectory_type": "m",
@@ -38,7 +39,8 @@
     "duration_s": 20.0,
     "vertical_drop_m": 0.5,
     "max_angular_speed_rad_s": 0.75,
-    "angular_ramp_rate_per_s": 0.1
+    "angular_ramp_rate_per_s": 0.1,
+    "yaw_mode": "constant"
   },
   "rendering": {
     "tool_dir": "~/tools/3dgrut",
@@ -53,8 +55,69 @@
     "Prototype parameters; integrators are ideal velocity/acceleration models and do not model mass, thrust, or motors.",
     "Estimated marker-camera mount applied to virtual body axes; measured body/marker/camera transforms can replace it.",
     "Only an assumed floor plane at Z=0 is enforced. Scene obstacles are visual, not collidable.",
-    "Baseline tracking controller; upstream FiGS/ACADOS MPC and a learned student are not integrated.",
+    "Linear MPC supports double-integrator position plus yaw only; baseline trackers remain available for other models. No learned student or PX4 integration.",
     "No PX4, ROS, or real-drone command interface."
   ],
-  "dynamics_model": "double_integrator"
+  "dynamics_model": "double_integrator",
+  "mpc": {
+    "horizon_steps": 20,
+    "position_weight": 30.0,
+    "velocity_weight": 3.0,
+    "yaw_weight": 8.0,
+    "input_weight": 0.08,
+    "input_change_weight": 0.1,
+    "terminal_multiplier": 4.0,
+    "max_iterations": 150
+  },
+  "randomization": {
+    "enabled": false,
+    "x_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "y_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "z_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "yaw_offset_deg": [
+      -15.0,
+      15.0
+    ],
+    "duration_scale": [
+      0.9,
+      1.1
+    ],
+    "initial_position_offset_m": [
+      -0.03,
+      0.03
+    ],
+    "initial_velocity_m_s": [
+      -0.03,
+      0.03
+    ],
+    "initial_yaw_offset_deg": [
+      -5.0,
+      5.0
+    ],
+    "acceleration_scale": [
+      0.8,
+      1.2
+    ],
+    "acceleration_bias_m_s2": [
+      -0.1,
+      0.1
+    ],
+    "velocity_damping_per_s": [
+      0.0,
+      0.15
+    ],
+    "yaw_rate_bias_rad_s": [
+      -0.02,
+      0.02
+    ]
+  }
 }

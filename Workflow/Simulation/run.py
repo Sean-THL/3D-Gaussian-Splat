@@ -83,9 +83,18 @@ class App:
         self.latest, self.latest_csv = self.sim.snapshot(), b''
         self.error, self.render_ms, self.frames = None, 0., 0
         self.control_hz = int(config['control_hz'])
+        self.save_episode()
         self.render_every = round(self.control_hz/config['render_hz'])
         if self.render_every < 1 or not np.isclose(self.render_every*config['render_hz'], self.control_hz):
             raise ValueError('control_hz must be an integer multiple of render_hz')
+
+    def save_episode(self, output=None):
+        output = self.output if output is None else output
+        write_telemetry(output/'telemetry.csv', self.sim.telemetry)
+        (output/'episode_parameters.json').write_text(json.dumps(self.sim.episode_parameters, indent=2)+'\n')
+        with (output/'demonstrations.jsonl').open('w') as f:
+            for row in self.sim.demonstrations:
+                f.write(json.dumps(row, allow_nan=False)+'\n')
 
     def publish(self, render=False):
         if render:
@@ -121,10 +130,17 @@ class App:
                     try:
                         command = self.commands.get_nowait()
                         event_time = self.sim.time
+                        if command.get('action') in ('reset', 'route', 'configure') and self.sim.telemetry:
+                            previous = self.output/f'episode_{self.sim.episode:04d}'
+                            previous.mkdir(exist_ok=True)
+                            self.save_episode(previous)
                         self.sim.command(command)
+                        if command.get('action') in ('reset', 'route', 'configure'):
+                            self.save_episode()
                         with (self.output/'events.jsonl').open('a') as f:
                             f.write(json.dumps(dict(time_s=event_time, command=command,
-                                                    effective_task=self.sim.config['task']))+'\n')
+                                                    effective_task=self.sim.route.config,
+                                                    episode_parameters=self.sim.episode_parameters))+'\n')
                         self.error = None
                         dirty = True
                     except (ValueError, KeyError, TypeError) as error:
@@ -143,7 +159,7 @@ class App:
             import traceback
             traceback.print_exc()
         finally:
-            write_telemetry(self.output/'telemetry.csv', self.sim.telemetry)
+            self.save_episode()
             (self.output/'final_config.json').write_text(json.dumps(self.sim.config, indent=2)+'\n')
 
 
@@ -238,11 +254,15 @@ def headless(app, duration, record):
             video.stdin.close()
             if video.wait() != 0:
                 raise RuntimeError('Video export failed')
-        write_telemetry(app.output/'telemetry.csv', sim.telemetry)
+        app.save_episode()
     errors = np.array([r['error_m'] for r in sim.telemetry])
     summary = dict(simulated_seconds=sim.time, wall_seconds=time.monotonic()-before,
                    position_error_rms_m=float(np.sqrt(np.mean(errors**2))),
                    position_error_max_m=float(errors.max()), final=sim.snapshot())
+    if sim.controller_type == 'mpc':
+        solve_times = [r['mpc_solve_ms'] for r in sim.telemetry]
+        summary.update(mpc_mean_solve_ms=float(np.mean(solve_times)), mpc_max_solve_ms=float(np.max(solve_times)),
+                       mpc_failed_solves=sum(r['mpc_status'] != 'solved' for r in sim.telemetry))
     (app.output/'summary.json').write_text(json.dumps(summary, indent=2)+'\n')
     print(json.dumps({k: v for k, v in summary.items() if k != 'final'}, indent=2), flush=True)
 
@@ -257,22 +277,41 @@ def main():
     parser.add_argument('--no-render', action='store_true', help='CPU dynamics only; no Gaussian image')
     parser.add_argument('--dynamics', choices=['single_integrator', 'double_integrator', 'quadrotor'],
                         help='Override the configured vehicle model')
+    parser.add_argument('--yaw-mode', choices=['constant', 'velocity_aligned'], help='Reference heading mode')
+    parser.add_argument('--controller', choices=['baseline', 'mpc'], help='Reference tracking controller')
+    parser.add_argument('--randomize', action='store_true', help='Sample task and plant settings on each reset')
+    parser.add_argument('--seed', type=int, help='Randomization seed')
+    parser.add_argument('--episodes', type=int, default=1, help='Number of headless episodes, with seeds seed+i')
     parser.add_argument('--trajectory', choices=['m', 'horizontal_circle', 'lissajous_figure8'],
                         help='Override the configured reference shape')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     if args.duration < 0 or not np.isfinite(args.duration):
         parser.error('Duration must be finite and nonnegative')
+    if args.episodes < 1 or (args.episodes != 1 and not args.headless):
+        parser.error('--episodes must be positive and multiple episodes require --headless')
     config = json.loads(args.config.read_text())
     if args.dynamics:
         config['dynamics_model'] = args.dynamics
+    if args.yaw_mode:
+        config['task']['yaw_mode'] = args.yaw_mode
     if args.trajectory:
         config['task']['trajectory_type'] = args.trajectory
+    if args.controller:
+        config['controller']['type'] = args.controller
+    if args.randomize:
+        config.setdefault('randomization', {})['enabled'] = True
+    if args.seed is not None:
+        config['seed'] = args.seed
+    if config.get('controller', {}).get('type', 'baseline') == 'mpc' and config.get('dynamics_model') != 'double_integrator':
+        parser.error('MPC requires double_integrator. Use --controller baseline for other dynamics.')
+    if config.get('randomization', {}).get('enabled') and config.get('dynamics_model') != 'double_integrator':
+        parser.error('Randomization currently supports double_integrator only.')
     output = args.output or ROOT/'data/scene_20261025_200034/simulation'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')
     output.mkdir(parents=True, exist_ok=False)
     (output/'config.json').write_text(json.dumps(config, indent=2)+'\n')
     provenance = dict(config_sha256=hashlib.sha256(args.config.read_bytes()).hexdigest(),
-                       no_render=args.no_render, argv=sys.argv, controller='baseline reference tracker, not MPC',
+                       no_render=args.no_render, argv=sys.argv, controller=config['controller'].get('type', 'baseline'),
                        code_revision=subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True).stdout.strip(),
                        notes=config['limitations'])
     provenance['source_sha256'] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
@@ -284,14 +323,32 @@ def main():
     print(f'OUTPUT={output}', flush=True)
     renderer = None
     if not args.no_render:
-        from Workflow.Simulation.rendering.threedgut import GaussianRenderer
-        renderer = GaussianRenderer(config['rendering'], ROOT)
-        print(f'Renderer ready: {renderer.device_name}', flush=True)
-    app = App(config, renderer, output)
-    if args.headless:
-        headless(app, args.duration, args.record)
-    else:
-        serve(app, args.port)
+        try:
+            from Workflow.Simulation.rendering.threedgut import GaussianRenderer
+            renderer = GaussianRenderer(config['rendering'], ROOT)
+            print(f'Renderer ready: {renderer.device_name}', flush=True)
+        except Exception as error:
+            (output/'failure.json').write_text(json.dumps(dict(phase='renderer_startup', error=str(error),
+                                                              type=type(error).__name__), indent=2)+'\n')
+            raise
+    runs = []
+    for i in range(args.episodes):
+        episode_config = json.loads(json.dumps(config))
+        episode_config['seed'] = int(config.get('seed', 42))+i
+        episode_output = output if args.episodes == 1 else output/f'episode_{i+1:04d}'
+        episode_output.mkdir(exist_ok=True)
+        (episode_output/'config.json').write_text(json.dumps(episode_config, indent=2)+'\n')
+        try:
+            app = App(episode_config, renderer, episode_output)
+            if args.headless:
+                headless(app, args.duration, args.record)
+            else:
+                serve(app, args.port)
+        except Exception as error:
+            (episode_output/'failure.json').write_text(json.dumps(dict(error=str(error), type=type(error).__name__), indent=2)+'\n')
+            raise
+        runs.append(dict(output=str(episode_output), seed=episode_config['seed']))
+    (output/'episodes.json').write_text(json.dumps(runs, indent=2)+'\n')
 
 
 if __name__ == '__main__':

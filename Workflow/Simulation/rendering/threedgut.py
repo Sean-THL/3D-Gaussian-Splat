@@ -12,14 +12,26 @@ class GaussianRenderer:
     def __init__(self, config, root):
         sys.path.insert(0, str(Path(config['tool_dir']).expanduser().resolve()))
         import torch
+        try:
+            torch.cuda.init()
+        except (RuntimeError, AssertionError) as error:
+            raise RuntimeError(
+                'CUDA initialization failed before Gaussian rendering. '
+                'Check nvidia-smi and CUDA initialization in this Python environment; '
+                'nvidia-smi alone does not verify CUDA computation. '
+                'Possible causes include driver/device state, device visibility, or process isolation. '
+                'To run the MPC and browser demo on CPU, use '
+                'python3 Workflow/Simulation/run.py --no-render --controller mpc '
+                '--dynamics double_integrator --trajectory lissajous_figure8 '
+                '--yaw-mode velocity_aligned. '
+                f'Original CUDA error: {error}'
+            ) from error
         from threedgrut.datasets.protocols import Batch
         from threedgrut.datasets.utils import read_colmap_intrinsics_binary
         from threedgrut.model.model import MixtureOfGaussians
         from Workflow.Calibration.align_vicon import vicon_body_to_gs
 
         self.torch, self.Batch, self.to_gs = torch, Batch, vicon_body_to_gs
-        if not torch.cuda.is_available():
-            raise RuntimeError('CUDA unavailable. Launch with run.sh outside the restricted sandbox.')
         calibration_path = root/config['alignment']
         self.calibration = json.loads(calibration_path.read_text())
         # Optional independently measured mount can replace the candidate estimate.

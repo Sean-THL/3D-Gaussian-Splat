@@ -9,6 +9,21 @@ import numpy as np
 class TimeTrajectory:
     continuous = False
 
+    def init_yaw(self, config):
+        self.yaw_mode = config.get('yaw_mode', 'constant')
+        if self.yaw_mode not in ('constant', 'velocity_aligned'):
+            raise ValueError('yaw_mode must be constant or velocity_aligned')
+        self.yaw = np.deg2rad(float(config.get('yaw_deg', 0.)))
+        if not np.isfinite(self.yaw):
+            raise ValueError('yaw_deg must be finite')
+
+    def yaw_reference(self, time):
+        """Desired unwrapped heading and world-Z heading rate, in rad and rad/s."""
+        if self.yaw_mode == 'constant':
+            return self.yaw, 0.
+        heading, rate = self.path_heading(float(time))
+        return heading+self.yaw, rate
+
     def sample(self, time):
         reference = self.trajectory_function(time)
         return reference[:3], reference[3:6], reference[6:9]
@@ -27,7 +42,7 @@ class MRoute(TimeTrajectory):
         self.altitude = float(config['altitude_m'])
         self.speed = float(config['speed_m_s'])
         self.acceleration = float(config.get('max_acceleration_m_s2', .5))
-        self.yaw = np.deg2rad(float(config.get('yaw_deg', 0.)))
+        self.init_yaw(config)
         self.hold = float(config.get('hover_seconds', 1.))
         if min(self.width, self.height, self.speed, self.acceleration) <= 0 or self.hold < 0:
             raise ValueError('Route dimensions, speed and acceleration must be positive')
@@ -41,6 +56,24 @@ class MRoute(TimeTrajectory):
                                     np.sqrt((10/np.sqrt(3))*lengths/self.acceleration))
         self.edges = np.r_[0., np.cumsum(self.durations)]
         self.duration = float(self.edges[-1]+2*self.hold)
+        delta = np.diff(self.points, axis=0)
+        self.headings = np.unwrap(np.arctan2(delta[:, 1], delta[:, 0]))
+
+    def path_heading(self, time):
+        # Blend around stopped corners, where the exact tangent is discontinuous.
+        local = time-self.hold
+        for i in range(1, 4):
+            half = min(.5, .2*self.durations[i-1], .2*self.durations[i])
+            edge = self.edges[i]
+            if local < edge-half:
+                return self.headings[i-1], 0.
+            if local <= edge+half:
+                u = (local-edge+half)/(2*half)
+                q = 10*u**3-15*u**4+6*u**5
+                dq = (30*u**2-60*u**3+30*u**4)/(2*half)
+                change = self.headings[i]-self.headings[i-1]
+                return self.headings[i-1]+change*q, change*dq
+        return self.headings[-1], 0.
 
     def sample(self, time):
         local = float(time)-self.hold
@@ -59,13 +92,13 @@ class MRoute(TimeTrajectory):
 
     def trajectory_function(self, time):
         position, velocity, acceleration = self.sample(time)
-        return np.r_[position, velocity, acceleration, self.yaw]
+        return np.r_[position, velocity, acceleration, self.yaw_reference(time)[0]]
 
 
 class AnalyticTrajectory(TimeTrajectory):
     def __init__(self, config):
         self.config = dict(config)
-        self.yaw = np.deg2rad(float(config.get('yaw_deg', 0.)))
+        self.init_yaw(config)
         xy = config.get('center_xy_m', [0., 0.])
         self.start = np.asarray(config.get('start_position_m', [*xy, config['altitude_m']]), dtype=float)
         self.duration = float(config.get('duration_s', 20.))
@@ -88,7 +121,7 @@ class HorizontalCircle(AnalyticTrajectory):
 
     def trajectory_function(self, time):
         if time < 0:
-            return np.r_[self.start, np.zeros(6), self.yaw]
+            return np.r_[self.start, np.zeros(6), self.yaw_reference(time)[0]]
         bt = self.beta*float(time)
         # log(cosh(bt)) = logaddexp(bt, -bt) - log(2), without overflow.
         theta = self.omega_max/self.beta*(np.logaddexp(bt, -bt)-np.log(2.))
@@ -99,7 +132,12 @@ class HorizontalCircle(AnalyticTrajectory):
         velocity = self.radius*np.array([-omega*sine, omega*cosine, 0.])
         acceleration = self.radius*np.array([-alpha*sine-omega**2*cosine,
                                              alpha*cosine-omega**2*sine, 0.])
-        return np.r_[position, velocity, acceleration, self.yaw]
+        return np.r_[position, velocity, acceleration, self.yaw_reference(time)[0]]
+
+    def path_heading(self, time):
+        bt = self.beta*max(time, 0.)
+        theta = self.omega_max/self.beta*(np.logaddexp(bt, -bt)-np.log(2.))
+        return theta+np.pi/2, self.omega_max*np.tanh(bt)
 
 
 class FigureEight(AnalyticTrajectory):
@@ -113,6 +151,20 @@ class FigureEight(AnalyticTrajectory):
         self.drop = float(config.get('vertical_drop_m', .5))
         if not np.isfinite([self.a, self.b, self.drop]).all() or min(self.a, self.b) <= 0 or self.drop < 0:
             raise ValueError('Figure-eight dimensions must be positive and vertical drop nonnegative')
+        self.heading_phase = np.linspace(0., 2*np.pi, 1025)
+        self.heading_unwrapped = np.unwrap(np.arctan2(self.b*np.cos(2*self.heading_phase),
+                                                     self.a*np.cos(self.heading_phase)))
+
+    def path_heading(self, time):
+        u = float(np.clip(time/self.duration, 0., 1.))
+        theta = 2*np.pi*(10*u**3-15*u**4+6*u**5)
+        theta_dot = 2*np.pi*(30*u**2-60*u**3+30*u**4)/self.duration
+        x, y = self.a*np.cos(theta), self.b*np.cos(2*theta)
+        raw = np.arctan2(y, x)
+        anchor = np.interp(theta, self.heading_phase, self.heading_unwrapped)
+        heading = raw+2*np.pi*np.round((anchor-raw)/(2*np.pi))
+        rate = (x*(-2*self.b*np.sin(2*theta))-y*(-self.a*np.sin(theta)))*theta_dot/(x*x+y*y)
+        return heading, rate
 
     def trajectory_function(self, time):
         u = float(np.clip(time/self.duration, 0., 1.))
@@ -130,7 +182,7 @@ class FigureEight(AnalyticTrajectory):
             -(2*np.pi)**2*a*np.sin(theta)*q_dot**2+2*np.pi*a*np.cos(theta)*q_ddot,
             -8*np.pi**2*b*np.sin(2*theta)*q_dot**2+2*np.pi*b*np.cos(2*theta)*q_ddot,
             -2*np.pi**2*h*np.cos(theta)*q_dot**2-np.pi*h*np.sin(theta)*q_ddot])
-        return np.r_[position, velocity, acceleration, self.yaw]
+        return np.r_[position, velocity, acceleration, self.yaw_reference(time)[0]]
 
 
 TRAJECTORIES = {'m': MRoute, 'horizontal_circle': HorizontalCircle, 'lissajous_figure8': FigureEight}

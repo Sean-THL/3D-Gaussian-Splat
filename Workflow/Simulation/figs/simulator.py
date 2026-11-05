@@ -8,6 +8,8 @@ from Workflow.Simulation.control.tracker import TrackingController
 from Workflow.Simulation.figs.dynamics import Quadrotor, State
 from Workflow.Simulation.figs.integrators import Integrator, IntegratorTracker
 from Workflow.Simulation.tasks.trajectory import make_trajectory, TRAJECTORIES
+from Workflow.Simulation.control.mpc import LinearMPC
+from Workflow.Simulation.randomization import sample_episode
 
 
 class Simulator:
@@ -17,8 +19,11 @@ class Simulator:
         if self.dynamics_model not in ('quadrotor', 'single_integrator', 'double_integrator'):
             raise ValueError(f'Unknown dynamics_model: {self.dynamics_model}')
         self.is_integrator = self.dynamics_model != 'quadrotor'
-        self.vehicle = Integrator(config['vehicle'], self.dynamics_model) if self.is_integrator else Quadrotor(config['vehicle'])
-        self.controller = IntegratorTracker(config['controller']) if self.is_integrator else TrackingController(config['controller'])
+        self.controller_type = config.get('controller', {}).get('type', 'baseline')
+        if self.controller_type not in ('baseline', 'mpc'):
+            raise ValueError('controller.type must be baseline or mpc')
+        if self.controller_type == 'mpc' and self.dynamics_model != 'double_integrator':
+            raise ValueError('MPC currently requires --dynamics double_integrator; use --controller baseline for other models')
         self.physics_dt = 1/float(config['physics_hz'])
         self.control_dt = 1/float(config['control_hz'])
         self.substeps = round(self.control_dt/self.physics_dt)
@@ -29,18 +34,30 @@ class Simulator:
         self.reset()
 
     def reset(self):
-        self.route = make_trajectory(self.config['task'])
-        self.state = State(self.route.trajectory_function(0.)[:3].copy(), np.zeros(3),
-                           Rotation.from_euler('z', self.route.yaw))
+        task, plant, sampled = sample_episode(self.config, self.rng)
+        self.route = make_trajectory(task)
+        self.vehicle = Integrator(plant, self.dynamics_model) if self.is_integrator else Quadrotor(plant)
+        initial_position = self.route.trajectory_function(0.)[:3]+sampled['initial_position_offset_m']
+        if initial_position[2] <= self.vehicle.floor or min(p[2] for p in self.route.polyline(401)) <= self.vehicle.floor:
+            raise ValueError('Sampled route/initial position crosses the assumed floor; revise randomization bounds')
+        initial_yaw = self.route.yaw_reference(0.)[0]+np.deg2rad(sampled['initial_yaw_offset_deg'])
+        self.state = State(initial_position, np.asarray(sampled['initial_velocity_m_s']), Rotation.from_euler('z', initial_yaw))
+        self.controller = (LinearMPC(self.config.get('mpc', {}), self.config['vehicle'], self.control_dt)
+                           if self.controller_type == 'mpc' else
+                           IntegratorTracker(self.config['controller']) if self.is_integrator else TrackingController(self.config['controller']))
+        self.episode_parameters = dict(episode=self.episode+1, seed=self.config.get('seed', 42),
+                                       task=task, plant=plant, randomization=sampled,
+                                       expert_model='nominal ideal double integrator' if self.controller_type == 'mpc' else 'baseline feedback')
         self.time, self.route_time = 0., 0.
         self.mode, self.paused = 'route', True
         self.hover_target = self.state.position.copy()
+        self.hover_yaw = self.route.yaw_reference(0.)[0]
         if not self.is_integrator:
             self.vehicle.wind[:] = 0.
         self.thrust = None if self.is_integrator else self.vehicle.mass*self.vehicle.gravity
         self.rates = np.zeros(3)
         self.translation_command, self.yaw_rate = np.zeros(3), 0.
-        self.history, self.telemetry = [self.state.position.tolist()], []
+        self.history, self.telemetry, self.demonstrations = [self.state.position.tolist()], [], []
         self.episode += 1
 
     def reference(self):
@@ -53,8 +70,19 @@ class Simulator:
         if self.paused:
             return
         decision_time = self.time
-        action, rotation_action = self.controller.command(
-            self.state, self.reference(), self.route.yaw, self.vehicle)
+        yaw, yaw_rate = self.yaw_reference()
+        if self.controller_type == 'mpc':
+            refs = self.reference_horizon(self.controller.horizon)
+            action, rotation_action = self.controller.command_horizon(self.state, refs)
+            self.demonstrations.append(dict(time_s=self.time, episode=self.episode,
+                position_m=self.state.position.tolist(), velocity_m_s=self.state.velocity.tolist(),
+                quaternion_xyzw=self.state.orientation.as_quat().tolist(),
+                reference_horizon=refs.tolist(), horizon_dt_s=self.control_dt,
+                action_acceleration_m_s2=action.tolist(), action_yaw_rate_rad_s=rotation_action,
+                solver=dict(self.controller.diagnostics)))
+        else:
+            action, rotation_action = self.controller.command(
+                self.state, self.reference(), yaw, self.vehicle, yaw_rate=yaw_rate)
         if self.is_integrator:
             self.translation_command, self.yaw_rate = action, rotation_action
             self.rates = np.array([0., 0., self.yaw_rate])
@@ -77,6 +105,8 @@ class Simulator:
             vx_m_s=v[0], vy_m_s=v[1], vz_m_s=v[2],
             qx=q[0], qy=q[1], qz=q[2], qw=q[3],
             reference_x_m=reference[0], reference_y_m=reference[1], reference_z_m=reference[2],
+            reference_yaw_rad=yaw, reference_yaw_rate_rad_s=yaw_rate,
+            yaw_reference_time_s=decision_time,
             error_m=float(np.linalg.norm(p-reference)), thrust_n=self.thrust,
             body_rate_x_rad_s=self.rates[0], body_rate_y_rad_s=self.rates[1], body_rate_z_rad_s=self.rates[2],
             dynamics_model=self.dynamics_model,
@@ -84,6 +114,9 @@ class Simulator:
             command_x=self.translation_command[0] if self.is_integrator else None,
             command_y=self.translation_command[1] if self.is_integrator else None,
             command_z=self.translation_command[2] if self.is_integrator else None))
+        self.telemetry[-1].update(controller=self.controller_type,
+            mpc_solve_ms=self.controller.diagnostics['solve_ms'] if self.controller_type == 'mpc' else None,
+            mpc_status=self.controller.diagnostics['status'] if self.controller_type == 'mpc' else None)
         self.telemetry = self.telemetry[-20000:]
 
     def command(self, command):
@@ -99,6 +132,7 @@ class Simulator:
             self.paused = False
         elif name == 'hover':
             self.hover_target = self.state.position.copy()
+            self.hover_yaw = self.state.orientation.as_euler('xyz')[2]
             self.mode, self.paused = 'hover', False
         elif name == 'nudge':
             delta = np.asarray(command['delta'], dtype=float)
@@ -106,6 +140,7 @@ class Simulator:
                 raise ValueError('Nudge requires three finite offsets no greater than 0.5 m')
             if self.mode != 'hover':
                 self.hover_target = self.state.position.copy()
+                self.hover_yaw = self.state.orientation.as_euler('xyz')[2]
             self.hover_target += delta
             self.hover_target[2] = max(self.hover_target[2], self.vehicle.floor+.1)
             self.mode, self.paused = 'hover', False
@@ -121,9 +156,10 @@ class Simulator:
             values = command.get('task', {})
             update = {}
             for key, value in values.items():
-                if key == 'trajectory_type':
-                    if value not in TRAJECTORIES:
-                        raise ValueError(f'Unknown trajectory_type: {value}')
+                if key in ('trajectory_type', 'yaw_mode'):
+                    choices = TRAJECTORIES if key == 'trajectory_type' else ('constant', 'velocity_aligned')
+                    if value not in choices:
+                        raise ValueError(f'Unknown {key}: {value}')
                     update[key] = value
                     continue
                 if key not in ranges:
@@ -156,8 +192,27 @@ class Simulator:
                     thrust_n=self.thrust, body_rates_rad_s=self.rates.tolist(),
                     dynamics_model=self.dynamics_model, command_units=self.command_units,
                     translation_command=self.translation_command.tolist() if self.is_integrator else None,
-                    task=dict(self.config['task']), route=self.route.polyline(), history=[p[:] for p in self.history])
+                    reference_yaw_rad=self.yaw_reference()[0], reference_yaw_rate_rad_s=self.yaw_reference()[1],
+                    controller=self.controller_type,
+                    solver=dict(self.controller.diagnostics) if self.controller_type == 'mpc' else None,
+                    randomization_enabled=self.episode_parameters['randomization']['enabled'],
+                    task=dict(self.route.config), route=self.route.polyline(), history=[p[:] for p in self.history])
 
     @property
     def command_units(self):
         return {'quadrotor': 'N and rad/s', 'single_integrator': 'm/s', 'double_integrator': 'm/s^2'}[self.dynamics_model]
+
+    def yaw_reference(self):
+        if self.mode == 'hover':
+            return self.hover_yaw, 0.
+        return self.route.yaw_reference(self.route_time)
+
+    def reference_horizon(self, steps):
+        rows = []
+        for k in range(steps+1):
+            if self.mode == 'hover':
+                rows.append(np.r_[self.hover_target, np.zeros(6), self.hover_yaw, 0.])
+            else:
+                t = self.route_time+k*self.control_dt
+                rows.append(np.r_[self.route.trajectory_function(t), self.route.yaw_reference(t)[1]])
+        return np.asarray(rows)

@@ -17,6 +17,12 @@ class Integrator:
         self.speed_limit = float(config.get('max_speed_m_s', 1.))
         self.acceleration_limit = float(config.get('max_acceleration_m_s2', 2.))
         self.rate_limit = float(config.get('max_body_rate_rad_s', 4.))
+        self.acceleration_scale = float(config.get('acceleration_scale', 1.))
+        self.acceleration_bias = np.asarray(config.get('acceleration_disturbance_m_s2', [0., 0., 0.]), dtype=float)
+        self.damping = float(config.get('velocity_damping_per_s', 0.))
+        self.yaw_bias = float(config.get('yaw_rate_bias_rad_s', 0.))
+        if self.acceleration_bias.shape != (3,) or not np.isfinite(np.r_[self.acceleration_bias, self.acceleration_scale, self.damping, self.yaw_bias]).all() or self.acceleration_scale <= 0 or self.damping < 0:
+            raise ValueError('Invalid integrator response/disturbance parameters')
         if not np.isfinite([self.floor, self.speed_limit, self.acceleration_limit, self.rate_limit]).all() or min(self.speed_limit, self.acceleration_limit, self.rate_limit) <= 0:
             raise ValueError('Integrator limits must be finite and positive')
 
@@ -30,14 +36,14 @@ class Integrator:
             velocity = limit_norm(command, self.speed_limit)
             position = state.position + velocity*dt
         else:
-            acceleration = limit_norm(command, self.acceleration_limit)
+            acceleration = self.acceleration_scale*limit_norm(command, self.acceleration_limit)+self.acceleration_bias-self.damping*state.velocity
             velocity = state.velocity + acceleration*dt
             position = state.position + state.velocity*dt + .5*acceleration*dt*dt
         if position[2] < self.floor:
             position[2] = self.floor
             velocity[2] = max(velocity[2], 0.)
         yaw = state.orientation.as_euler('xyz')[2]
-        yaw += float(np.clip(yaw_rate, -self.rate_limit, self.rate_limit))*dt
+        yaw += (float(np.clip(yaw_rate, -self.rate_limit, self.rate_limit))+self.yaw_bias)*dt
         return State(position, velocity, Rotation.from_euler('z', yaw))
 
 
@@ -47,7 +53,7 @@ class IntegratorTracker:
         self.kd = float(config.get('velocity_gain', 3.2))
         self.yaw_gain = float(config.get('attitude_gain', 12.))
 
-    def command(self, state, reference, yaw, vehicle):
+    def command(self, state, reference, yaw, vehicle, yaw_rate=0.):
         position, velocity, acceleration = reference
         if vehicle.model == 'single_integrator':
             action = limit_norm(velocity+self.kp*(position-state.position), vehicle.speed_limit)
@@ -55,4 +61,4 @@ class IntegratorTracker:
             action = limit_norm(acceleration+self.kp*(position-state.position)+self.kd*(velocity-state.velocity), vehicle.acceleration_limit)
         error = yaw-state.orientation.as_euler('xyz')[2]
         error = np.arctan2(np.sin(error), np.cos(error))
-        return action, float(np.clip(self.yaw_gain*error, -vehicle.rate_limit, vehicle.rate_limit))
+        return action, float(np.clip(yaw_rate+self.yaw_gain*error, -vehicle.rate_limit, vehicle.rate_limit))
