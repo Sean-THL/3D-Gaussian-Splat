@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1008pt" height="1728pt" viewBox="0 0 1008 1728" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>Vicon to 3DGS Camera Alignment</title>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Vicon to 3DGS Camera Alignment</dc:title>
+    <dc:date>2026-11-05T14:07:49.309178</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.8.4, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 1728 
+L 1008 1728 
+L 1008 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 60.48 195.264 
+L 947.52 195.264 
+Q 955.584 195.264 955.584 181.44 
+L 955.584 108.864 
+Q 955.584 95.04 947.52 95.04 
+L 60.48 95.04 
+Q 52.416 95.04 52.416 108.864 
+L 52.416 181.44 
+Q 52.416 195.264 60.48 195.264 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #edf5fb"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 67.536 435.456 
+L 940.464 435.456 
+Q 949.536 435.456 949.536 419.904 
+L 949.536 236.736 
+Q 949.536 221.184 940.464 221.184 
+L 67.536 221.184 
+Q 58.464 221.184 58.464 236.736 
+L 58.464 419.904 
+Q 58.464 435.456 67.536 435.456 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #fafcfe; stroke: #d5e1eb; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 504 439.184953 
+Q 504 444.959697 504 449.392801 
+" clip-path="url(#p44ad65a8cb)" style="fill: none; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 506.8 443.792801 
+L 504 449.392801 
+L 501.2 443.792801 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #7893ac; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 67.536 668.736 
+L 940.464 668.736 
+Q 949.536 668.736 949.536 653.184 
+L 949.536 470.016 
+Q 949.536 454.464 940.464 454.464 
+L 67.536 454.464 
+Q 58.464 454.464 58.464 470.016 
+L 58.464 653.184 
+Q 58.464 668.736 67.536 668.736 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #fafcfe; stroke: #d5e1eb; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 504 672.464953 
+Q 504 678.239697 504 682.672801 
+" clip-path="url(#p44ad65a8cb)" style="fill: none; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 506.8 677.072801 
+L 504 682.672801 
+L 501.2 677.072801 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #7893ac; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 67.536 902.016 
+L 940.464 902.016 
+Q 949.536 902.016 949.536 886.464 
+L 949.536 703.296 
+Q 949.536 687.744 940.464 687.744 
+L 67.536 687.744 
+Q 58.464 687.744 58.464 703.296 
+L 58.464 886.464 
+Q 58.464 902.016 67.536 902.016 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #fafcfe; stroke: #d5e1eb; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 504 905.744953 
+Q 504 911.519697 504 915.952801 
+" clip-path="url(#p44ad65a8cb)" style="fill: none; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 506.8 910.352801 
+L 504 915.952801 
+L 501.2 910.352801 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #7893ac; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 67.536 1135.296 
+L 940.464 1135.296 
+Q 949.536 1135.296 949.536 1119.744 
+L 949.536 936.576 
+Q 949.536 921.024 940.464 921.024 
+L 67.536 921.024 
+Q 58.464 921.024 58.464 936.576 
+L 58.464 1119.744 
+Q 58.464 1135.296 67.536 1135.296 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #fafcfe; stroke: #d5e1eb; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 504 1139.024953 
+Q 504 1144.799697 504 1149.232801 
+" clip-path="url(#p44ad65a8cb)" style="fill: none; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 506.8 1143.632801 
+L 504 1149.232801 
+L 501.2 1143.632801 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #7893ac; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 67.536 1368.576 
+L 940.464 1368.576 
+Q 949.536 1368.576 949.536 1353.024 
+L 949.536 1169.856 
+Q 949.536 1154.304 940.464 1154.304 
+L 67.536 1154.304 
+Q 58.464 1154.304 58.464 1169.856 
+L 58.464 1353.024 
+Q 58.464 1368.576 67.536 1368.576 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #fafcfe; stroke: #d5e1eb; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 504 1372.304953 
+Q 504 1378.079697 504 1382.512801 
+" clip-path="url(#p44ad65a8cb)" style="fill: none; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 506.8 1376.912801 
+L 504 1382.512801 
+L 501.2 1376.912801 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #7893ac; stroke: #7893ac; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 67.536 1601.856 
+L 940.464 1601.856 
+Q 949.536 1601.856 949.536 1586.304 
+L 949.536 1403.136 
+Q 949.536 1387.584 940.464 1387.584 
+L 67.536 1387.584 
+Q 58.464 1387.584 58.464 1403.136 
+L 58.464 1586.304 
+Q 58.464 1601.856 67.536 1601.856 
+z
+" clip-path="url(#p44ad65a8cb)" style="fill: #f1faf8; stroke: #baded8; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="fill: #172b43; font: 700 28px 'DejaVu Sans'; text-anchor: start" x="60.48" y="59.291625" transform="rotate(-0 60.48 59.291625)">Vicon ↔ 3DGS Camera Alignment</text>
+   </g>
+   <g id="text_2">
+    <text style="fill: #4d6277; font: 13px 'DejaVu Sans'; text-anchor: start" x="60.48" y="94.549969" transform="rotate(-0 60.48 94.549969)">From COLMAP camera recovery to a saved coordinate transformation</text>
+   </g>
+   <g id="text_3">
+    <text style="fill: #172b43; font: 11.2px 'DejaVu Sans'; text-anchor: start" x="78.624" y="136.1465" transform="rotate(-0 78.624 136.1465)">FRAMES   G: original 3DGS world    V: Vicon world    B: tracked marker body    C: RGB optical camera</text>
+   </g>
+   <g id="text_4">
+    <!-- $R_{AB}$ maps vectors from B into A.   $c$: camera centre.   $b$: marker-body position.   $s$: metres / GS unit. -->
+    <g style="fill: #172b43" transform="translate(78.624 167.24)">
+     <text>
+      <tspan style="font: oblique 11.2px 'DejaVu Sans'" x="0 189.407776 298.901062 447.441345" y="-0.5">Rcbs</tspan>
+      <tspan style="font: oblique 7.84px 'DejaVu Sans'" x="7.773346 13.130563" y="1.3375000000000004">AB</tspan>
+      <tspan style="font: 11.2px 'DejaVu Sans'" x="18.809326 22.365509 33.263489 40.11911 47.220551 53.049194 56.605377 63.226105 70.109039 76.259979 80.646484 87.49118 92.090729 97.919373 101.475555 105.414124 110.013672 116.858368 127.756348 131.312531 138.987549 142.543732 145.651978 152.742493 157.128998 163.973694 167.529877 175.183044 178.739227 182.29541 185.851593 195.558716 199.327942 202.884125 209.035065 215.890686 226.788666 233.6716 238.271149 245.12677 248.682953 254.833893 261.716827 268.807343 273.193848 277.793396 284.676331 288.232513 291.788696 295.344879 306.002502 309.771729 313.327911 324.225891 331.081512 335.681061 342.15976 349.042694 353.642242 357.679138 364.780579 371.625275 378.726715 385.347443 388.903625 396.005066 402.849762 408.678406 411.786652 416.173157 419.281403 426.126099 433.216614 436.772797 440.328979 443.885162 453.269989 457.039215 460.595398 471.493378 478.376312 482.762817 487.362366 494.2453 500.073944 503.630127 507.399353 510.955536 519.624756 526.726196 530.282379 537.372894 544.463409 547.571655 551.95816" y="-0.5"> maps vectors from B into A.   : camera centre.   : marker-body position.   : metres / GS unit.</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_5">
+    <text style="fill: #2584c6; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="260.159" transform="rotate(-0 79.632 260.159)">01</text>
+   </g>
+   <g id="text_6">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="260.0965" transform="rotate(-0 126 260.0965)">Recover the camera trajectory from COLMAP</text>
+   </g>
+   <g id="text_7">
+    <text style="fill: #4d6277; font: 10.9px 'DejaVu Sans'; text-anchor: start" x="79.632" y="296.767719" transform="rotate(-0 79.632 296.767719)">Read the world-to-camera pose for each image from COLMAP images.bin.</text>
+   </g>
+   <g id="text_8">
+    <!-- $p_C = R_{CG,k}\,p_G + t_{CG,k}$ -->
+    <g style="fill: #172b43" transform="translate(90.72 348.432)">
+     <text>
+      <tspan style="font: oblique 19px 'DejaVu Sans'" x="0 45.189941 96.109632 142.319153" y="-0.15625">pRpt</tspan>
+      <tspan style="font: oblique 13.3px 'DejaVu Sans'" x="12.060547 58.391602 67.678223 84.803271 108.170179 149.768861 159.055482 176.18053" y="2.9609375">CCGkGCGk</tspan>
+      <tspan style="font: 19px 'DejaVu Sans'" x="25.568359 122.697571" y="-0.15625">=+</tspan>
+      <tspan style="font: 13.3px 'DejaVu Sans'" x="77.984424 169.361683" y="2.9609375">,,</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_9">
+    <!-- $c_{G,k}=-R_{CG,k}^{T}t_{CG,k},\qquad R_{GC,k}=R_{CG,k}^{T}$ -->
+    <g style="fill: #172b43" transform="translate(90.72 404.028)">
+     <text>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="0 78.100488 123.417773 207.582715 274.995703" y="-0.9140625">cRtRR</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="9.896484 26.120215 90.607324 91.870605 99.405176 115.628906 130.475391 139.273242 155.496973 220.089551 229.85332 245.111133 287.502539 288.76582 296.300391 312.524121" y="2.0390625 2.0390625 4.0078125 -7.8125 4.0078125 4.0078125 2.0390625 2.0390625 2.0390625 2.0390625 2.0390625 2.0390625 4.0078125 -7.8125 4.0078125 4.0078125">GkCTGkCGkGCkCTGk</tspan>
+      <tspan style="font: 12.6px 'DejaVu Sans'" x="19.660254 109.168945 149.037012 238.651172 306.06416" y="2.0390625 4.0078125 2.0390625 2.0390625 4.0078125">,,,,,</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="37.415918 59.511621 163.28584 256.406836" y="-0.9140625">=−,=</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_10">
+    <text style="fill: #2584c6; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="493.439" transform="rotate(-0 79.632 493.439)">02</text>
+   </g>
+   <g id="text_11">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="493.3765" transform="rotate(-0 126 493.3765)">Match image times to Vicon poses</text>
+   </g>
+   <g id="text_12">
+    <text style="fill: #4d6277; font: 10.9px 'DejaVu Sans'; text-anchor: start" x="79.632" y="530.047719" transform="rotate(-0 79.632 530.047719)">Use sensor-header timestamps; interpolate position linearly and orientation with SLERP.</text>
+   </g>
+   <g id="text_13">
+    <!-- $\tau_k=t_k^{\mathrm{RGB}}+\Delta t$ -->
+    <g style="fill: #172b43" transform="translate(90.72 583.232)">
+     <text>
+      <tspan style="font: oblique 19px 'DejaVu Sans'" x="0 42.983789 117.207464" y="-0.6515625000000043">τtt</tspan>
+      <tspan style="font: oblique 13.3px 'DejaVu Sans'" x="11.438965 50.433496" y="2.4656249999999957 4.543749999999996">kk</tspan>
+      <tspan style="font: 19px 'DejaVu Sans'" x="23.362207 84.588324 104.209906" y="-0.6515625000000043">=+Δ</tspan>
+      <tspan style="font: 13.3px 'DejaVu Sans'" x="51.695501 60.936663 71.242865" y="-8.123437500000001">RGB</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_14">
+    <!-- $b_{V,k}=\mathrm{Interp}_{p}(\tau_k),\qquad R_{VB,k}=\mathrm{SLERP}_{R}(\tau_k)$ -->
+    <g style="fill: #172b43" transform="translate(90.72 636.498)">
+     <text>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="0 125.749512 195.694629 334.439648" y="-0.328125">bτRτ</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="11.425781 26.505176 110.236816 136.586426 208.201465 216.820898 231.924902 318.170215 345.276563" y="2.625">VkpkVBkRk</tspan>
+      <tspan style="font: 12.6px 'DejaVu Sans'" x="20.045215 225.464941" y="2.625">,,</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="37.800879 56.389746 61.69834 73.106543 80.16416 91.238379 98.63877 118.727051 144.375293 151.397754 243.220605 261.809473 273.235254 283.263574 294.636621 307.143457 327.417188 353.06543" y="-0.328125">=Interp(),=SLERP()</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_15">
+    <text style="fill: #2584c6; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="726.719" transform="rotate(-0 79.632 726.719)">03</text>
+   </g>
+   <g id="text_16">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="726.6565" transform="rotate(-0 126 726.6565)">Convert the marker-body pose to the camera pose</text>
+   </g>
+   <g id="text_17">
+    <!-- Fixed mount: $d_B$ is the camera origin in B; $R_{BC}$ maps camera axes into B. -->
+    <g style="fill: #4d6277" transform="translate(79.632 763.3175)">
+     <text>
+      <tspan style="font: 10.9px 'DejaVu Sans'" x="0 6.264236 9.289993 15.735031 22.435318 29.348312 32.81012 43.4189 50.081955 56.984314 63.886673 68.156769 71.825974 87.728372 91.190179 94.215936 99.889902 103.351709 107.621805 114.524164 121.224451 124.686258 130.673975 137.347665 147.956445 154.656732 159.134225 165.807916 169.269724 175.932779 180.410272 183.436029 190.349023 193.37478 200.277139 203.738947 206.764703 213.667062 217.12887 224.600214 228.269418 250.148891 253.610698 264.219478 270.893169 277.806163 283.480128 286.941936 292.929652 299.603343 310.212123 316.91241 321.389903 328.063594 331.525401 338.199092 344.64413 351.344417 357.018382 360.48019 363.505946 370.408305 374.678401 381.341457 384.803264 392.274608" y="-0.71875">Fixed mount:  is the camera origin in B;  maps camera axes into B.</tspan>
+      <tspan style="font: oblique 10.9px 'DejaVu Sans'" x="75.287781 231.731226" y="-0.71875">dR</tspan>
+      <tspan style="font: oblique 7.63px 'DejaVu Sans'" x="82.200775 239.298288 244.528229" y="1.0671874999999993">BBC</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_18">
+    <!-- $c_{V,k}=b_{V,k}+R_{VB,k}\,d_B$ -->
+    <g style="fill: #172b43" transform="translate(90.72 815.277)">
+     <text>
+      <tspan style="font: oblique 19px 'DejaVu Sans'" x="0 57.908252 117.430762 166.980189" y="-0.5625">cbRd</tspan>
+      <tspan style="font: oblique 13.3px 'DejaVu Sans'" x="10.446289 26.363428 69.968799 85.885937 130.632422 139.730713 155.673828 179.040736" y="2.5546875">VkVkVBkB</tspan>
+      <tspan style="font: 13.3px 'DejaVu Sans'" x="19.54458 79.06709 148.85498" y="2.5546875">,,,</tspan>
+      <tspan style="font: 19px 'DejaVu Sans'" x="38.28667 97.80918" y="-0.5625">=+</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_19">
+    <!-- $R_{VC,k}=R_{VB,k}\,R_{BC}$ -->
+    <g style="fill: #172b43" transform="translate(90.72 870.048)">
+     <text>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="0 66.268652 113.210215" y="-0.875">RRR</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="12.506836 21.12627 36.384082 78.775488 87.394922 102.498926 125.717051 134.361094" y="2.078125">VCkVBkBC</tspan>
+      <tspan style="font: 12.6px 'DejaVu Sans'" x="29.924121 96.038965" y="2.078125">,,</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="47.679785" y="-0.875">=</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_20">
+    <text style="fill: #2584c6; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="959.999" transform="rotate(-0 79.632 959.999)">04</text>
+   </g>
+   <g id="text_21">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="959.999" transform="rotate(-0 126 959.999)">Fit the scene scale, rotation and translation</text>
+   </g>
+   <g id="text_22">
+    <!-- Fit $\Theta=(s,R,t,R_{BC},d_B,\Delta t)$; fix mounting/delay parameters if independently known. -->
+    <g style="fill: #4d6277" transform="translate(79.632 996.5975)">
+     <text>
+      <tspan style="font: 10.9px 'DejaVu Sans'" x="0 6.264236 9.289993 13.560089 17.021896 27.715765 38.962674 48.885464 62.03609 71.889749 95.890977 113.915132 119.498695 131.218864 135.46769 139.136894 142.598701 146.432747 149.458504 155.903542 159.365349 169.974129 176.637184 183.539543 190.441902 194.711998 197.737755 204.640114 211.553108 215.222313 222.135307 228.835594 231.861351 238.535042 244.98008 248.441887 255.354881 262.028572 266.506065 273.179756 283.788536 290.488823 294.758919 301.459206 305.936699 311.610664 315.072472 318.098228 321.932274 325.394081 328.419838 335.322197 342.235191 348.935478 355.848473 362.548759 369.451118 376.364113 383.0644 389.966759 394.236855 397.262611 403.707649 407.169456 413.476234 420.378593 427.041649 435.948769 442.851128" y="-0.71875">Fit Θ=(,,,,,Δ); fix mounting/delay parameters if independently known.</tspan>
+      <tspan style="font: oblique 10.9px 'DejaVu Sans'" x="43.211499 54.469028 67.619653 77.473312 101.474541 126.948769" y="-0.71875">sRtRdt</tspan>
+      <tspan style="font: oblique 7.63px 'DejaVu Sans'" x="85.040375 90.270316 108.387535" y="1.0671874999999993">BCB</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_23">
+    <!-- $c_{V,k}\simeq sR\,c_{G,k}+t,\qquad R_{VC,k}\simeq R\,R_{GC,k}$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1048.272)">
+     <text>
+      <tspan style="font: oblique 19px 'DejaVu Sans'" x="0 57.908252 67.807178 84.093616 143.209778 197.417298 267.367542 283.653981" y="-0.15625">csRctRRR</tspan>
+      <tspan style="font: oblique 13.3px 'DejaVu Sans'" x="10.446289 26.363428 94.539905 111.664954 210.618958 219.717249 235.822718 296.855641 307.161842 323.267311" y="2.9609375">VkGkVCkGCk</tspan>
+      <tspan style="font: 13.3px 'DejaVu Sans'" x="19.54458 104.846107 229.00387 316.448463" y="2.9609375">,,,,</tspan>
+      <tspan style="font: 19px 'DejaVu Sans'" x="38.28667 123.588196 150.659486 247.74596" y="-0.15625">≃+,≃</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_24">
+    <!-- $\min_{\Theta}\ \frac{1}{2}\sum_{k\in\mathcal{F}}\sum_{i=1}^{3}\left[\rho\!\left(\frac{e_{p,k,i}^{2}}{\sigma_p^2}\right)+\rho\!\left(\frac{e_{R,k,i}^{2}}{\sigma_R^2}\right)\right]$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1105.483)">
+     <text>
+      <tspan style="font: 17.5px 'DejaVu Sans'" x="0 17.047119 21.90918 172.059254" y="-0.6578124999999986">min+</tspan>
+      <tspan style="font: 12.25px 'DejaVu Sans'" x="12 38.682805 38.682805 55.758122 77.819465 81.416023 88.083625" y="11.712500000000006 -8.329687499999999 6.228125000000006 16.68125 16.68125 -21.910937500000003 16.68125">Θ12∈=31</tspan>
+      <tspan style="font: 17.5px 'DejaVu Sans Display'" x="53.664128 77.416023" y="-0.6578124999999986 -0.6578125000000021">∑∑</tspan>
+      <tspan style="font: oblique 12.25px 'DejaVu Sans'" x="48.664128 74.416023 123.486324 132.486324 209.144997 217.144997" y="16.68125 16.68125 -13.465937500000003 8.194687499999993 -12.677343749999999 8.1946875">kieσeσ</tspan>
+      <tspan style="font: italic 12.25px 'STIXNonUnicode'" x="66.42902" y="16.68125"></tspan>
+      <tspan style="font: 15.388757px 'STIXSizeThreeSym'" x="95.877449 111.95509 157.118596 252.049479" y="7.268437499999997">[()]</tspan>
+      <tspan style="font: oblique 17.5px 'DejaVu Sans'" x="103.687935 190.131764" y="-0.6578124999999986">ρρ</tspan>
+      <tspan style="font: 8.575px 'DejaVu Sans'" x="131.591932 136.466061 140.79779 145.828219 217.250606 222.639736 225.456463 232.001894" y="-18.160312500000003 -10.113593750000003 3.501406249999995 -10.113593750000003 -17.37171875 -9.325 3.5014062500000023 -9.325">2,2,2,2,</tspan>
+      <tspan style="font: oblique 8.575px 'DejaVu Sans'" x="131.022945 140.25024 140.862423 150.224581 216.681619 224.908913 227.036099 236.398257" y="-10.113593750000003 11.54703124999999 -10.113593750000003 -10.113593750000003 -9.325 11.547031249999996 -9.325 -9.325">ppkiRRki</tspan>
+      <tspan style="font: 14.342949px 'STIXSizeThreeSym'" x="198.398919 241.303401" y="5.906406249999996">()</tspan>
+     </text>
+     <rect x="38.682805" y="-4.954687" width="7.793823" height="1.09375"/>
+     <rect x="123.486324" y="-4.954688" width="31.444771" height="1.09375"/>
+     <rect x="209.144997" y="-4.954687" width="29.970903" height="1.09375"/>
+    </g>
+   </g>
+   <g id="text_25">
+    <text style="fill: #2584c6; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="1193.279" transform="rotate(-0 79.632 1193.279)">05</text>
+   </g>
+   <g id="text_26">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="1193.2165" transform="rotate(-0 126 1193.2165)">Validate the alignment on excluded poses</text>
+   </g>
+   <g id="text_27">
+    <text style="fill: #4d6277; font: 10.9px 'DejaVu Sans'; text-anchor: start" x="79.632" y="1229.887719" transform="rotate(-0 79.632 1229.887719)">Fit on selected time blocks; evaluate excluded blocks and check independent physical dimensions.</text>
+   </g>
+   <g id="text_28">
+    <!-- $\mathbf{e}_{p,k}=sR\,c_{G,k}+t-c_{V,k},\qquad E_{p,k}=\|\mathbf{e}_{p,k}\|_2$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1281.132)">
+     <text>
+      <tspan style="font: 700 18px 'DejaVu Sans'" x="0 308.46539" y="-0.25">ee</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="12.380273 26.838281 91.426523 107.650254 176.584629 191.664023 255.122812 269.58082 320.845664 335.303672" y="2.703125">pkGkVkpkpk</tspan>
+      <tspan style="font: 12.6px 'DejaVu Sans'" x="20.37832 101.190293 185.204062 263.120859 328.843711 352.264805" y="2.703125">,,,,,2</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="38.133984 118.945957 148.099277 199.45289 280.876523 299.46539 343.092539" y="-0.25">=+−,=‖‖</tspan>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="56.722852 66.100781 81.530039 137.534824 166.688144 243.749765" y="-0.25">sRctcE</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_29">
+    <!-- $\mathbf{e}_{R,k}=\mathrm{Log}\!\left(R_{VC,k}^{T}R\,R_{GC,k}\right)^{\vee},\qquad E_{\theta,k}=\frac{180}{\pi}\|\mathbf{e}_{R,k}\|_2$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1337.778)">
+     <text>
+      <tspan style="font: 700 18px 'DejaVu Sans'" x="0 353.949744" y="-0.5906249999999993">ee</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="12.380273 27.59502 108.07911 109.342392 116.698544 131.956356 167.681317 177.445087 192.702899 274.596814 288.765662 326.650232 366.330017 381.544763" y="2.3625000000000007 2.3625000000000007 4.331250000000001 -7.489062499999999 4.331250000000001 4.331250000000001 2.3625000000000007 2.3625000000000007 2.3625000000000007 2.3625000000000007 2.3625000000000007 4.042187500000001 2.3625000000000007 2.3625000000000007">RkVTCkGCkθkπRk</tspan>
+      <tspan style="font: 12.6px 'DejaVu Sans'" x="21.135059 125.496395 186.242938 209.212341 282.305701 318.650232 326.666736 334.68324 375.084802 398.505896" y="2.3625000000000007 4.331250000000001 2.3625000000000007 -7.481249999999999 2.3625000000000007 -8.6484375 -8.6484375 -8.6484375 2.3625000000000007 2.3625000000000007">,,,∨,180,2</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="38.890723 57.47959 67.50791 78.520605 218.926892 300.061365 344.949744 389.33363" y="-0.5906249999999993">=Log,=‖‖</tspan>
+      <tspan style="font: 18.270572px 'STIXSizeOneSym'" x="87.023965 200.491766" y="2.796875">()</tspan>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="95.572274 139.745224 155.174481 263.223767" y="-0.5906249999999993">RRRE</tspan>
+     </text>
+     <rect x="318.650232" y="-4.973437" width="24.049512" height="1.125"/>
+    </g>
+   </g>
+   <g id="text_30">
+    <text style="fill: #087f80; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="79.632" y="1426.559" transform="rotate(-0 79.632 1426.559)">06</text>
+   </g>
+   <g id="text_31">
+    <text style="fill: #172b43; font: 700 16px 'DejaVu Sans'; text-anchor: start" x="126" y="1426.4965" transform="rotate(-0 126 1426.4965)">Save the calibration; use its inverse for rendering</text>
+   </g>
+   <g id="text_32">
+    <!-- Store $s,R,t,R_{BC},d_B,\Delta t$.  Here $R=R_{VG}$.  The original PLY can stay unchanged. -->
+    <g style="fill: #4d6277" transform="translate(79.632 1463.1575)">
+     <text>
+      <tspan style="font: 10.9px 'DejaVu Sans'" x="0 6.912994 11.18309 17.846146 22.323639 29.023926 38.159698 51.310324 61.163983 85.165211 103.189366 108.772929 120.493098 123.954906 127.416713 130.87852 139.06776 145.768047 150.24554 156.945827 170.096452 200.330545 203.792352 207.25416 210.715967 217.368387 224.270746 230.971033 234.43284 241.095895 245.573389 248.599146 255.51214 258.537897 265.440256 272.113947 275.139703 278.601511 285.168848 291.236322 297.888742 301.350549 307.338266 314.011957 320.914316 324.376123 330.050089 334.320184 340.993875 347.438913 350.90072 357.803079 364.705438 370.693155 377.595514 384.269205 391.171564 398.084558 404.784845 411.697839" y="-0.71875">Store ,,,,,Δ.  Here =.  The original PLY can stay unchanged.</tspan>
+      <tspan style="font: oblique 10.9px 'DejaVu Sans'" x="32.485733 43.743262 56.893887 66.747546 90.748775 116.223003 160.407634 181.343361" y="-0.71875">sRtRdtRR</tspan>
+      <tspan style="font: oblique 7.63px 'DejaVu Sans'" x="74.314609 79.54455 97.661769 188.910423 194.125475" y="1.0671874999999993">BCBVG</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_33">
+    <!-- $c_G=\frac{1}{s}R^{T}(c_V-t)=\frac{1}{s}R^{T}\!\left(b_V+R_{VB}d_B-t\right)$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1516.637)">
+     <text>
+      <tspan style="font: oblique 19px 'DejaVu Sans'" x="0 55.432129 86.022093 129.409447 178.431859 205.937044 250.938656 282.882406 327.909994" y="-0.9890624999999993">cRctRbRdt</tspan>
+      <tspan style="font: oblique 13.3px 'DejaVu Sans'" x="10.446289 45.595264 69.965794 96.468382 168.594993 192.965524 217.997591 264.140316 273.238607 294.942953" y="2.1281250000000007 4.076562499999998 -8.2625 2.1281250000000007 4.076562499999998 -8.2625 2.1281250000000007 2.1281250000000007 2.1281250000000007 2.1281250000000007">GsTVsTVVBB</tspan>
+      <tspan style="font: 19px 'DejaVu Sans'" x="24.973682 78.609495 109.787865 136.859154 147.973411 198.524447 231.317074 308.288412 335.359701" y="-0.9890624999999993">=(−)=(+−)</tspan>
+      <tspan style="font: 13.3px 'DejaVu Sans'" x="44.595264 167.594993" y="-9.309375000000001">11</tspan>
+     </text>
+     <rect x="44.595264" y="-5.559375" width="8.461865" height="1.1875"/>
+     <rect x="167.594993" y="-5.559375" width="8.461865" height="1.1875"/>
+    </g>
+   </g>
+   <g id="text_34">
+    <!-- $R_{GC}=R^{T}R_{VC}=R^{T}R_{VB}R_{BC}$ -->
+    <g style="fill: #172b43" transform="translate(90.72 1571.544563)">
+     <text>
+      <tspan style="font: oblique 18px 'DejaVu Sans'" x="0 53.656348 75.615234 128.127246 150.086133 180.348633" y="-0.921875">RRRRRR</tspan>
+      <tspan style="font: oblique 12.6px 'DejaVu Sans'" x="12.506836 22.270605 67.426465 88.12207 96.741504 141.897363 162.592969 171.212402 192.855469 201.499512" y="2.03125 2.03125 -7.8125 2.03125 2.03125 -7.8125 2.03125 2.03125 2.03125 2.03125">GCTVCTVBBC</tspan>
+      <tspan style="font: 18px 'DejaVu Sans'" x="35.06748 109.538379" y="-0.921875">==</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_35">
+    <!-- FIT DETAILS   $\mathcal{F}$: fitting poses; $\rho$: soft-L1 loss; $\sigma_p=0.02$ m; $\sigma_R=1^{\circ}$ (converted to radians). -->
+    <g style="fill: #4d6277" transform="translate(60.48 1640.574)">
+     <text>
+      <tspan style="font: 10.8px 'DejaVu Sans'" x="0 6.210312 9.394547 15.9897 19.421707 27.735504 34.557358 41.152512 48.538452 51.722687 57.73793 64.591415 68.023422 71.455429 81.926987 85.564606 88.996613 92.797653 95.797363 100.030701 104.264038 107.263748 114.106689 120.960175 124.392181 131.245667 137.851364 143.476486 150.119095 155.744217 159.381836 169.667328 173.304947 176.736954 182.362076 188.967773 192.768814 197.002151 200.898087 206.91333 213.782623 217.21463 220.21434 226.820038 232.44516 238.070282 241.707901 259.179092 270.329184 277.198477 280.630484 287.499777 294.36907 297.801077 308.318533 311.956152 329.88125 341.031342 353.03032 356.462327 360.674577 366.610749 373.216447 380.059388 386.448945 393.091554 397.530503 401.763841 408.406449 415.259934 418.691941 422.925279 429.530976 432.962983 437.401933 444.018174 450.871659 453.871369 460.487611 467.330552 472.955674 477.167924" y="-0.796875">FIT DETAILS   : fitting poses; : soft-L1 loss; =0.02 m; =1 (converted to radians).</tspan>
+      <tspan style="font: italic 10.8px 'STIXNonUnicode'" x="74.887436" y="-0.796875"></tspan>
+      <tspan style="font: oblique 10.8px 'DejaVu Sans'" x="162.813843 245.139908 315.388159" y="-0.796875">ρσσ</tspan>
+      <tspan style="font: oblique 7.56px 'DejaVu Sans'" x="251.982849 322.2311" y="0.9749999999999996">pR</tspan>
+      <tspan style="font: 7.56px 'DejaVu Sans'" x="348.003994" y="-4.9312499999999995">∘</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_36">
+    <!-- $\mathrm{Log}(\cdot)^{\vee}$ converts a relative rotation matrix to a rotation vector in radians. -->
+    <g style="fill: #4d6277" transform="translate(60.48 1663.682)">
+     <text>
+      <tspan style="font: 10.6px 'DejaVu Sans'" x="0 5.902084 12.383514 19.108063 23.241074 26.608521 36.560565 39.928012 45.752506 52.233936 58.948139 65.217487 71.735126 76.090564 80.244266 85.763568 89.131015 95.622791 98.990238 103.345676 109.863315 112.806598 119.298374 123.452076 126.395359 132.664707 139.182346 142.549793 146.905231 153.386661 157.540363 164.032138 168.18584 171.129123 177.610553 184.324756 187.692203 198.011798 204.503574 208.657276 213.012714 215.955997 222.225345 225.592792 229.746494 236.227924 239.595371 246.087146 249.454593 253.810031 260.291461 264.445163 270.936939 275.090641 278.033924 284.515354 291.229557 294.597003 300.866352 307.383991 313.208484 317.362186 323.843616 328.199054 331.566501 334.509784 341.223987 344.591434 348.946872 355.438648 362.163196 365.106479 371.598255 378.312458 383.83176" y="-0.6437500000000007">Log(⋅) converts a relative rotation matrix to a rotation vector in radians.</tspan>
+      <tspan style="font: 7.42px 'DejaVu Sans'" x="30.842977" y="-4.7015625000000005">∨</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_37">
+    <text style="fill: #087f80; font: 10.7px 'DejaVu Sans'; text-anchor: start" x="60.48" y="1691.208531" transform="rotate(-0 60.48 1691.208531)">Current calibration: mount and alignment were estimated jointly. Independent mounting verification is still needed.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p44ad65a8cb">
+   <rect x="0" y="0" width="1008" height="1728"/>
+  </clipPath>
+ </defs>
+</svg>

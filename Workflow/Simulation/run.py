@@ -58,7 +58,7 @@ def draw_record_frame(rgb, state):
     def point(p):
         q = (np.array(p)[:2]-low)/(high-low)
         return (width+25+int(q[0]*270), 230-int(q[1]*190))
-    draw.text((width+20, 12), 'M ROUTE / VICON WORLD XY', fill='#9db1c8')
+    draw.text((width+20, 12), state['trajectory_label'].upper()+' / VICON XY', fill='#9db1c8')
     draw.line([point(p) for p in route], fill='#3b526d', width=3)
     if len(history) > 1:
         draw.line([point(p) for p in history], fill='#58ddbf', width=2)
@@ -210,7 +210,7 @@ def serve(app, port):
 def headless(app, duration, record):
     sim, renderer = app.sim, app.renderer
     sim.paused = False
-    duration = duration or sim.route.duration+2.
+    duration = duration or sim.route.duration+(0. if sim.route.continuous else 2.)
     count = int(np.ceil(duration/sim.control_dt))
     video = None
     if record:
@@ -255,16 +255,24 @@ def main():
     parser.add_argument('--duration', type=float, default=0., help='0 runs the full task plus settling time')
     parser.add_argument('--record', action='store_true', help='Export an MP4 during headless mode')
     parser.add_argument('--no-render', action='store_true', help='CPU dynamics only; no Gaussian image')
+    parser.add_argument('--dynamics', choices=['single_integrator', 'double_integrator', 'quadrotor'],
+                        help='Override the configured vehicle model')
+    parser.add_argument('--trajectory', choices=['m', 'horizontal_circle', 'lissajous_figure8'],
+                        help='Override the configured reference shape')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     if args.duration < 0 or not np.isfinite(args.duration):
         parser.error('Duration must be finite and nonnegative')
     config = json.loads(args.config.read_text())
+    if args.dynamics:
+        config['dynamics_model'] = args.dynamics
+    if args.trajectory:
+        config['task']['trajectory_type'] = args.trajectory
     output = args.output or ROOT/'data/scene_20261025_200034/simulation'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')
     output.mkdir(parents=True, exist_ok=False)
     (output/'config.json').write_text(json.dumps(config, indent=2)+'\n')
     provenance = dict(config_sha256=hashlib.sha256(args.config.read_bytes()).hexdigest(),
-                       no_render=args.no_render, argv=sys.argv, controller='baseline geometric tracker, not MPC',
+                       no_render=args.no_render, argv=sys.argv, controller='baseline reference tracker, not MPC',
                        code_revision=subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True).stdout.strip(),
                        notes=config['limitations'])
     provenance['source_sha256'] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()

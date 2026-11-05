@@ -1,8 +1,8 @@
 # Gaussian flight simulator
 
-A runnable local simulator couples a FiGS-style lightweight quadrotor model to the existing native 3DGUT renderer. It provides a browser camera view, RGB/depth toggle, M-route tracking, telemetry, route settings, hover/nudge controls, and a disturbance button. Measured camera offsets can replace the candidate mount later.
+A runnable local simulator couples selectable single-integrator, double-integrator, and FiGS-style quadrotor models to the existing native 3DGUT renderer. The default is now the double integrator. It provides a browser camera view, RGB/depth toggle, M-route tracking, telemetry, route settings, hover/nudge controls, and a disturbance button. Measured camera offsets can replace the candidate mount later.
 
-This is our prototype implementation of the lightweight approach. It does not install or invoke upstream FiGS/ACADOS. The first controller is a baseline geometric feedback tracker; MPC and student training remain future work. Isaac Sim is not required.
+This is our prototype implementation of the lightweight approach. It does not install or invoke upstream FiGS/ACADOS. The controllers are baseline reference trackers; MPC and student training remain future work. Isaac Sim is not required.
 
 A native Isaac Sim backend is the next requested direction. Its [host inspection and step-by-step build guide](isaac_sim/README.md) are separate from this already runnable prototype. Remote Isaac Sim installation/version are not yet verified.
 
@@ -14,7 +14,7 @@ From the repository root:
 Workflow/Simulation/run.sh
 ```
 
-Open **http://127.0.0.1:8765**. The simulator starts paused. Press **Play** to run the reference, or **Fly M route** to restart and run it. **Pause** freezes simulation time. **Reset** returns to the initial paused state. **Hold position** switches to hover; the XYZ nudge buttons move that hover target by 10 cm. **Wind pulse** applies a repeatable velocity disturbance. **Download telemetry** exports the current episode's state/reference/control CSV.
+Open **http://127.0.0.1:8765**. The simulator starts paused. Press **Play** to run the reference, or **Run reference** to restart and run it. **Pause** freezes simulation time. **Reset** returns to the initial paused state. **Hold position** switches to hover; the XYZ nudge buttons move that hover target by 10 cm. **Disturbance** applies a repeatable velocity impulse for the double integrator and quadrotor, or a position displacement for the single integrator (which has no velocity memory). **Download telemetry** exports the current episode's state/reference/control CSV.
 
 The default M route is 0.6×0.6 m at Z=1.2 m, with fixed yaw 0 degrees and peak speed 0.3 m/s. It is a provisional small route near the capture trajectory, not a surveyed flight task. Route settings can be changed in the browser; **Apply & reset** starts a new paused episode. The route slows to zero speed at each corner using a quintic trajectory with continuous position, velocity, and acceleration.
 
@@ -36,6 +36,51 @@ python3 Workflow/Simulation/run.py --no-render --headless
 
 `--no-render` disables Gaussian rendering explicitly. It can also run the browser viewer for dynamics/route controls, with a labeled placeholder instead of a scene image. FFmpeg is needed only for `--record`.
 
+## Select the dynamics
+
+No build is needed. Restart with one of:
+
+```bash
+Workflow/Simulation/run.sh --dynamics single_integrator --trajectory lissajous_figure8
+Workflow/Simulation/run.sh --dynamics double_integrator --trajectory lissajous_figure8
+Workflow/Simulation/run.sh --dynamics quadrotor --trajectory lissajous_figure8
+```
+
+For a CPU-only rollout, use `python3 Workflow/Simulation/run.py --no-render --headless` with the same options. Alternatively set the top-level `dynamics_model` in the JSON config. An older config without that key retains the original quadrotor behavior.
+
+| Model | Translational equation | Command | Tracking baseline |
+| --- | --- | --- | --- |
+| `single_integrator` | `p_dot = u` | World XYZ velocity (m/s) | Reference velocity + proportional position correction |
+| `double_integrator` | `p_dot = v`, `v_dot = u` | World XYZ acceleration (m/s²) | Reference acceleration + position/velocity feedback |
+| `quadrotor` | Thrust direction, gravity, linear drag | Collective thrust (N) + body rates (rad/s) | Geometric tracking controller |
+
+The integrators have independent yaw dynamics `yaw_dot = yaw_rate`, with wrapped yaw-error feedback. They retain zero roll/pitch, so changing `task.yaw_deg` changes the camera heading without rotating the route. They model no mass, gravity, motor response, or aerodynamic coupling. Their camera images therefore also lack the banking of a physical drone.
+
+In `vehicle`, `max_speed_m_s` limits the single-integrator command norm; `max_acceleration_m_s2` limits the double-integrator command norm. The double integrator has no hard speed cap. `max_body_rate_rad_s` limits integrator yaw rate; `floor_z_m` supplies the same assumed floor constraint as before. Mass, drag, gravity, and thrust limits apply only to `quadrotor`. Single-integrator velocity is diagnostic output, not an independently evolving state.
+
+Telemetry records `dynamics_model`, command units, and XYZ integrator commands. Thrust is null/blank for integrators. These remain baseline controllers, not MPC experts; an eventual expert and student must use the selected model's action interface. An integrator action is not a direct thrust/body-rate command for deployment.
+
+## Analytic references
+
+All three references expose `trajectory_function(t)`, returning
+`[px, py, pz, vx, vy, vz, ax, ay, az, yaw]` in metres, seconds, and radians.
+Select a shape in the browser or from the command line:
+
+```bash
+Workflow/Simulation/run.sh --trajectory lissajous_figure8
+Workflow/Simulation/run.sh --trajectory horizontal_circle
+```
+
+The analytic references implement the supplied circle and Lissajous equations. The default remains the M route. This interface is connected to the lightweight prototype; the native Isaac drone backend is still pending.
+
+- **Circle:** `radius_m` defaults to half `width_m`. `max_angular_speed_rad_s` defaults to 0.75 rad/s and `angular_ramp_rate_per_s` to 0.1 per second. Its center is one radius left of its starting position. Motion continues until paused; `duration_s` controls the preview and default recording horizon. Asymptotic speed is radius times angular speed. The name `a_const` in the supplied snippet represents angular speed, not acceleration.
+- **Figure eight:** `a_m` defaults to half `width_m`; `b_m` defaults to `height_m`, giving total XY extents `2a` by `b`. `duration_s` defaults to 20 seconds for one cycle, then the reference holds at its starting point with zero velocity and acceleration. `vertical_drop_m` defaults to 0.5 m in the Z-up frame; set it to zero for a horizontal route.
+- Both use `start_position_m` when supplied; otherwise they start at `[center_xy_m[0], center_xy_m[1], altitude_m]`. Yaw stays at `yaw_deg`.
+
+To reproduce the supplied dimensions exactly, set `radius_m: 1.0` for the circle, or `a_m: 1.0`, `b_m: 1.0`, `vertical_drop_m: 0.5`, and `duration_s: 20.0` for the figure eight in a custom JSON config passed with `--config`. Explicit radius/a/b/start overrides take precedence over the browser's dimension fields.
+
+The M route's speed/acceleration settings apply to the M route. Analytic speeds and accelerations follow from their dimensions and timing; the circle/figure eight do not automatically enforce those M-route limits. Longer figure-eight durations reduce speed in proportion to `1/T` and acceleration to `1/T²`.
+
 ## Where to find the code
 
 | File | Purpose |
@@ -44,8 +89,9 @@ python3 Workflow/Simulation/run.py --no-render --headless
 | `viewer.html` | Live camera, route map, controls, and settings |
 | `configs/demo.json` | Scene paths, alignment, vehicle, camera, timing, controller, and M-route defaults |
 | `figs/dynamics.py` | Prototype 10-state thrust/body-rate dynamics |
+| `figs/integrators.py` | Ideal velocity/acceleration models and tracking controllers |
 | `figs/simulator.py` | Deterministic stepping, episode control, references, and telemetry |
-| `tasks/trajectory.py` | Quintic M-route trajectory |
+| `tasks/trajectory.py` | Common reference interface, quintic M route, analytic circle and figure eight |
 | `control/tracker.py` | Baseline position/attitude feedback controller |
 | `rendering/threedgut.py` | Native renderer adapter for moving camera poses |
 | `test_simulation.py` | Physics, trajectory limits, tracking recovery, and control-state tests |
@@ -54,9 +100,9 @@ Upstream 3DGUT remains at `~/tools/3dgrut`, separate from our adapters. The mode
 
 ## Dynamics, coordinates, and rendering
 
-The virtual world uses Vicon's recorded Z-up frame. The virtual body is right-handed, with X forward, Y left, and Z up. State consists of world position, world velocity, and a body-to-world quaternion (10 scalar values). Collective thrust is in newtons along body +Z; angular-rate commands are in body rad/s. The model integrates translation and commanded rotation directly, following the lightweight FiGS approach rather than motor/rotor dynamics.
+The virtual world uses Vicon's recorded Z-up frame. The virtual body is right-handed, with X forward, Y left, and Z up. The common state container holds world position, world velocity, and a body-to-world quaternion (10 scalar values). For the quadrotor model, collective thrust is in newtons along body +Z; angular-rate commands are in body rad/s. The model integrates translation and commanded rotation directly, following the lightweight FiGS approach rather than motor/rotor dynamics.
 
-The baseline controller converts reference acceleration, position/velocity errors, and gravity compensation into collective thrust and body rates. Defaults are 100 Hz physics, 20 Hz control, and 10 Hz rendering. Vehicle mass (0.85 kg), drag, rate limits, and feedback gains are prototype values, not identified hardware parameters.
+For the quadrotor model, the baseline controller converts reference acceleration, position/velocity errors, and gravity compensation into collective thrust and body rates. Defaults are 100 Hz physics, 20 Hz control, and 10 Hz rendering. Vehicle mass (0.85 kg), drag, rate limits, and feedback gains are prototype values, not identified hardware parameters.
 
 The renderer transforms each virtual body pose into a camera pose using the configured candidate marker-to-camera mounting transform and Vicon-to-Gaussian alignment. For the prototype, virtual body axes are assumed to coincide with the recorded marker-body axes; measured marker/body/camera transforms can replace this assumption. The renderer uses a 640×360 pinhole camera derived from the undistorted COLMAP calibration, with matching focal lengths and principal point. Depth display is opacity-normalized expected camera-Z depth in metres on a fixed 0–8 m color scale; gray indicates missing/invalid values.
 
@@ -89,7 +135,7 @@ Each run records initial configuration, source-code hashes, alignment hash, Git 
 python3 -m unittest Workflow.Simulation.test_simulation -v
 ```
 
-Validated on the local RTX 4060 Laptop GPU with the October 25 checkpoint: the full task plus settling simulated 17.7 seconds in approximately 5.6 seconds headlessly, exporting a 960×360 camera/map MP4 at 10 fps. Tracking RMS was 0.00392 m and maximum 0.00820 m **within the prototype's own model**. These numbers are not real-flight, geometry, or calibration accuracy. Live RGB/depth streaming, play/pause, reset, hover nudges, and browser layout were also exercised. A disturbance-recovery test passes.
+The original quadrotor model was validated on the local RTX 4060 Laptop GPU with the October 25 checkpoint: the full task plus settling simulated 17.7 seconds in approximately 5.6 seconds headlessly, exporting a 960×360 camera/map MP4 at 10 fps. Tracking RMS was 0.00392 m and maximum 0.00820 m **within the prototype's own model**. These numbers are not real-flight, geometry, or calibration accuracy. Live RGB/depth streaming, play/pause, reset, hover nudges, and browser layout were also exercised. Regression tests cover the original quadrotor, exact constant-input integrator solutions, command limits, independent yaw, and all three routes with disturbance recovery.
 
 The first complete recording is `data/scene_20261025_200034/simulation/20261104T170951_575410Z/simulation.mp4`. `simulation/latest_demo.json` points to the completed demo and live session artifacts.
 
