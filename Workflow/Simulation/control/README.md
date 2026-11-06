@@ -1,6 +1,6 @@
 # Linear MPC expert
 
-`mpc.py` is a nominal linear MPC for the existing **double-integrator position plus single-integrator yaw** plant. It does not control the simplified thrust/body-rate quadrotor. Select that model with `--controller baseline`, or implement a separate quadrotor MPC later; acceleration labels cannot be treated as thrust/body-rate labels.
+`mpc.py` is a nominal linear MPC for the existing **double-integrator position plus single-integrator yaw** plant. It does not control the simplified thrust/body-rate quadrotor. For the quadrotor expert, use the new `configs/quadrotor_nmpc.json` profile and `control/quadrotor_mpc.py`; see [the native/backend guide](../isaac_sim/NATIVE_BACKEND.md). Acceleration labels cannot be treated as thrust/body-rate labels.
 
 ## Model and optimization
 

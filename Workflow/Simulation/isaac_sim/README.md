@@ -1,6 +1,66 @@
 # Isaac Sim backend: inspection and build sequence
 
-This directory is for a **native Isaac Sim backend** alongside the existing lightweight prototype. The inspection script and a finite native physics smoke test are implemented. The smoke test has not yet executed on the remote machine; the drone application is not implemented yet. Noninteractive SSH authentication from the local agent currently fails, so remote execution currently uses the user's SSH terminal.
+**New:** [native force/torque quadrotor backend, native WebRTC viewer, and synchronized NMPC dataset collection](NATIVE_BACKEND.md). The older live bridge below is still a visualization-only application.
+
+This directory is for a **native Isaac Sim backend** alongside the existing lightweight prototype. The inspection script, a finite native physics smoke test, and a live bridge to the CUDA/MPC simulator are implemented. The native drone/data runner is now implemented and runtime-validated separately; see NATIVE_BACKEND.md. The older cube smoke-test notes below are historical and are not the current drone validation status. Noninteractive SSH authentication from the local agent currently fails, so remote execution currently uses the user's SSH terminal.
+
+For the complete local/remote startup sequence and playback controls, see [RUNNING.md](RUNNING.md).
+
+## Live CUDA/MPC bridge (deployed November 6, 2026)
+
+The existing simulator now runs on `tk@141.212.76.61` with the RTX 4090. The Isaac 4.5 streaming editor displays the same drone pose, reference and actual paths, sampled parameters, and native Gaussian camera image. Play/Pause/Reset/Hold/Disturbance and yaw-mode controls call the simulator's localhost API.
+
+**Architecture:** the existing CUDA process owns MPC, domain randomization, and custom dynamics. Isaac owns a visualization stage and UI, not a second physics integration. Its viewport contains a procedural drone, mesh-ribbon paths, and decimated Gaussian centers as a visual proxy. The camera panel contains actual RGB/depth images rendered by 3DGUT in its original environment. This does not import a Gaussian PLY as a native Isaac scene or create collision geometry. Native force/torque flight remains a later backend.
+
+### Open the currently deployed demo
+
+- On the local laptop, open **http://127.0.0.1:8767**. This forwards remote `127.0.0.1:8765` through the authenticated SSH connection. Press Play; the server starts paused.
+- In the existing **Isaac Sim WebRTC Streaming Client 1.0.6**, connect to **141.212.76.61**. Look for **DASC: CUDA camera + MPC controls**. Its buttons control the same episode as the browser. The normal Isaac timeline is not the dynamics clock for this bridge.
+- Reconnect the browser forward later with `ssh -L 8767:127.0.0.1:8765 tk@141.212.76.61` in your own terminal. Enter the password there, never in chat. Keep the SSH session open. The current reusable master has a 30-minute idle persistence setting.
+
+Both applications are separate persistent project processes. Their PID records and logs are in `data/scene_20261025_200034/remote_launch/{cuda_server,isaac_bridge}.{pid,log}` on the remote host. Live Isaac status is recorded in `data/scene_20261025_200034/isaac_sim/live_bridge_status.json`.
+
+### Start again from separate remote terminals
+
+CUDA simulator:
+
+```bash
+cd ~/Seans_Project/DASC/3D-Gaussian-Splat
+PATH="$HOME/anaconda3/bin:$PATH" SIMULATION_ENV="$HOME/anaconda3/envs/3dgrut" \
+  bash Workflow/Simulation/run.sh --controller mpc --dynamics double_integrator \
+  --trajectory lissajous_figure8 --yaw-mode velocity_aligned --randomize --seed 42
+```
+
+Isaac streaming editor, in another terminal with Conda deactivated:
+
+```bash
+cd ~/Seans_Project/DASC/3D-Gaussian-Splat
+bash Workflow/Simulation/isaac_sim/run_live_bridge.sh
+```
+
+Do not launch duplicates if ports 8765 or 49100 are already occupied. The launchers reuse existing environments/installations; no Isaac, driver, or other-project container upgrades were performed.
+
+To attach to an already-running streamed editor, use its Script Editor:
+
+```python
+import sys
+sys.path.insert(0, '/home/tk/Seans_Project/DASC/3D-Gaussian-Splat')
+from Workflow.Simulation.isaac_sim import start_live_bridge
+```
+
+The bridge expects a Z-up stage in metres. It preserves other scene objects and creates/replaces only `/World/DASCFlight`. Its generated proxy geometry has no rigid-body or collision APIs. The two environments communicate through localhost HTTP; no 3DGUT/Slang/PyTorch extension is imported into Isaac's bundled Python.
+
+### Files and verification
+
+- `bridge_client.py`: localhost-only state/control/scene client and validated raw RGBA transport.
+- `live_bridge.py`: USD visualization, Gaussian image UI, controls, and runtime status reporting.
+- `start_live_bridge.py`: asynchronous Kit `--exec`/Script Editor bootstrap.
+- `run_live_bridge.sh`: uses the existing Isaac streaming launcher, without nested SimulationApp creation.
+- `test_bridge.py`: frame encoding/decoding, malformed-frame rejection, and client request tests.
+
+Remote CUDA computation and a 3-second Gaussian-rendered randomized MPC rollout passed on the 4090; the recording is `data/scene_20261025_200034/simulation/20261106T045631_888817Z/simulation.mp4`. The persistent viewer output is `simulation/20261106T045819_928716Z/`. Isaac startup reached `DASC_ISAAC_BRIDGE_READY`, and its runtime report confirmed actual Native 3DGUT frame consumption with no server error. Local regression and protocol tests passed. Human WebRTC-client appearance remains to be checked on the user's display.
+
+Kit image uploads use [ByteImageProvider](https://docs.omniverse.nvidia.com/kit/docs/omni.ui/2.26.2/omni.ui/omni.ui.ByteImageProvider.html). Streaming uses the installed release's [standalone/Kit integration](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/python_scripting/manual_standalone_python.html).
 
 ## Confirmed remote inventory
 
@@ -136,10 +196,11 @@ Next add MPC only after the dynamics/sensor loop works. ROS 2/PX4 and student tr
 | --- | --- |
 | `inspect_host.sh` | Implemented read-only host inventory |
 | `smoke_test.py`, `run_smoke_test.sh` | Implemented for 4.5; native execution awaiting remote test |
-| `drop_demo.py` | Implemented editor-native falling-cube demo for the already-running stream; remote visualization awaiting confirmation |
-| `build_scene.py` | Planned: native stage, drone/camera, collision proxies, visual scene |
-| `run_quadrotor.py` | Planned: dynamics/controller/sensor loop |
-| `../configs/isaac_*.json` | Planned: version, assets, dynamics, and mount settings |
+| `drop_demo.py` | Implemented editor-native falling-cube demo |
+| `live_bridge.py`, `start_live_bridge.py`, `run_live_bridge.sh` | Deployed and running: external CUDA simulator state/camera/controls inside streamed Isaac |
+| `native_backend.py` | Implemented: native floor/drone rigid body, force/torque actuator adapter |
+| `native_rollout.py`, `native_supervisor.py`, `run_native.sh` | Implemented: finite native validation and synchronized RGB/expert-data collection |
+| `../configs/quadrotor_nmpc.json` | Implemented: shared nominal physics, actuator response, expert, randomization and validation settings |
 | `data/scene_20261025_200034/isaac_sim/` | Ignored generated assets, logs, recordings, and USD scenes |
 
 ## Primary references

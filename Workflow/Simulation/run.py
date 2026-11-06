@@ -2,10 +2,12 @@
 """Local interactive drone simulator and reproducible headless rollouts."""
 import argparse
 import csv
+import errno
 import hashlib
 import io
 import json
 import queue
+import socket
 import subprocess
 import sys
 import threading
@@ -21,6 +23,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from Workflow.Simulation.figs.simulator import Simulator
+from Workflow.Simulation.isaac_sim.bridge_client import encode_rgba
 
 
 def jpeg(image):
@@ -78,8 +81,10 @@ class App:
     def __init__(self, config, renderer, output):
         self.sim = Simulator(config)
         self.renderer, self.output = renderer, output
+        self.scene_preview = renderer.scene_preview() if renderer else dict(points_m=[], kind='no scene renderer')
         self.lock, self.commands, self.stop = threading.Lock(), queue.Queue(), threading.Event()
         self.frame, self.depth = jpeg(placeholder()), jpeg(placeholder())
+        self.rgba, self.depth_rgba = encode_rgba(placeholder()), encode_rgba(placeholder())
         self.latest, self.latest_csv = self.sim.snapshot(), b''
         self.error, self.render_ms, self.frames = None, 0., 0
         self.control_hz = int(config['control_hz'])
@@ -101,9 +106,11 @@ class App:
             before = time.monotonic()
             if self.renderer:
                 rgb, depth = self.renderer.render(self.sim.state)
-                frames = jpeg(rgb), jpeg(depth_rgb(depth))
+                depth_image = depth_rgb(depth)
             else:
-                frames = jpeg(placeholder()), jpeg(placeholder())
+                rgb, depth_image = placeholder(), placeholder()
+            frames = jpeg(rgb), jpeg(depth_image)
+            rgba_frames = encode_rgba(rgb), encode_rgba(depth_image)
             self.render_ms = (time.monotonic()-before)*1000
             self.frames += 1
         snapshot = self.sim.snapshot()
@@ -120,6 +127,7 @@ class App:
             self.latest, self.latest_csv = snapshot, stream.getvalue().encode()
             if render:
                 self.frame, self.depth = frames
+                self.rgba, self.depth_rgba = rgba_frames
 
     def worker(self):
         tick, dirty = 0, True
@@ -188,8 +196,12 @@ def serve(app, port):
                     return self.send(page, 'text/html; charset=utf-8')
                 if self.path.startswith('/api/state'):
                     return self.send(json.dumps(app.latest, allow_nan=False).encode())
+                if self.path == '/api/scene':
+                    return self.send(json.dumps(app.scene_preview, allow_nan=False).encode())
                 if self.path.startswith('/frame.jpg'):
                     return self.send(app.depth if 'mode=depth' in self.path else app.frame, 'image/jpeg')
+                if self.path.startswith('/frame.rgba'):
+                    return self.send(app.depth_rgba if 'mode=depth' in self.path else app.rgba, 'application/octet-stream')
                 if self.path == '/api/export':
                     return self.send(app.latest_csv, 'text/csv', download=True)
             self.send(b'{"error":"Not found"}', code=404)
@@ -229,6 +241,12 @@ def headless(app, duration, record):
     duration = duration or sim.route.duration+(0. if sim.route.continuous else 2.)
     count = int(np.ceil(duration/sim.control_dt))
     video = None
+    recorder = None
+    if sim.config.get('record_rgb_actions', False):
+        if renderer is None or sim.controller_type != 'nmpc':
+            raise ValueError('--dataset requires Gaussian rendering and thrust/body-rate NMPC')
+        from Workflow.Simulation.dataset import DemonstrationRecorder
+        recorder = DemonstrationRecorder(app.output, renderer)
     if record:
         width = int(sim.config['rendering']['width'])+320
         height = int(sim.config['rendering']['height'])
@@ -240,7 +258,12 @@ def headless(app, duration, record):
     before = time.monotonic()
     try:
         for i in range(count):
+            observation = recorder.capture(sim) if recorder else None
             sim.advance()
+            if recorder:
+                if sim.telemetry[-1]['error_m'] > sim.config.get('validation', {}).get('max_position_error_m', .2):
+                    raise RuntimeError('Tracking exceeded the dataset development acceptance limit')
+                recorder.write(sim.demonstrations[-1], observation)
             if i % app.render_every == 0:
                 rgb = renderer.render(sim.state)[0] if renderer else placeholder(
                     sim.config['rendering']['width'], sim.config['rendering']['height'])
@@ -250,6 +273,8 @@ def headless(app, duration, record):
             if i % app.control_hz == 0:
                 print(f"Simulated {sim.time:.1f}/{duration:.1f}s; error={sim.snapshot()['tracking_error_m']:.4f}m", flush=True)
     finally:
+        if recorder:
+            recorder.close()
         if video:
             video.stdin.close()
             if video.wait() != 0:
@@ -259,7 +284,7 @@ def headless(app, duration, record):
     summary = dict(simulated_seconds=sim.time, wall_seconds=time.monotonic()-before,
                    position_error_rms_m=float(np.sqrt(np.mean(errors**2))),
                    position_error_max_m=float(errors.max()), final=sim.snapshot())
-    if sim.controller_type == 'mpc':
+    if sim.is_expert:
         solve_times = [r['mpc_solve_ms'] for r in sim.telemetry]
         summary.update(mpc_mean_solve_ms=float(np.mean(solve_times)), mpc_max_solve_ms=float(np.max(solve_times)),
                        mpc_failed_solves=sum(r['mpc_status'] != 'solved' for r in sim.telemetry))
@@ -274,11 +299,13 @@ def main():
     parser.add_argument('--headless', action='store_true')
     parser.add_argument('--duration', type=float, default=0., help='0 runs the full task plus settling time')
     parser.add_argument('--record', action='store_true', help='Export an MP4 during headless mode')
+    parser.add_argument('--dataset', action='store_true', help='Record synchronized pre-action RGB/thrust/body-rate labels')
+    parser.add_argument('--pose-render-service', action='store_true', help='CUDA pose-to-RGB service for the native Isaac backend')
     parser.add_argument('--no-render', action='store_true', help='CPU dynamics only; no Gaussian image')
     parser.add_argument('--dynamics', choices=['single_integrator', 'double_integrator', 'quadrotor'],
                         help='Override the configured vehicle model')
     parser.add_argument('--yaw-mode', choices=['constant', 'velocity_aligned'], help='Reference heading mode')
-    parser.add_argument('--controller', choices=['baseline', 'mpc'], help='Reference tracking controller')
+    parser.add_argument('--controller', choices=['baseline', 'mpc', 'nmpc'], help='Reference tracking controller')
     parser.add_argument('--randomize', action='store_true', help='Sample task and plant settings on each reset')
     parser.add_argument('--seed', type=int, help='Randomization seed')
     parser.add_argument('--episodes', type=int, default=1, help='Number of headless episodes, with seeds seed+i')
@@ -288,8 +315,27 @@ def main():
     args = parser.parse_args()
     if args.duration < 0 or not np.isfinite(args.duration):
         parser.error('Duration must be finite and nonnegative')
+    if args.dataset and (not args.headless or args.no_render):
+        parser.error('--dataset requires --headless and CUDA rendering')
+    if args.pose_render_service and (args.headless or args.no_render):
+        parser.error('--pose-render-service requires CUDA and runs as a server, without --headless')
     if args.episodes < 1 or (args.episodes != 1 and not args.headless):
         parser.error('--episodes must be positive and multiple episodes require --headless')
+    if not args.headless:
+        if not 1 <= args.port <= 65535:
+            parser.error('--port must be in [1, 65535]')
+        # Check before creating outputs or initializing the expensive GPU renderer.
+        # serve() still performs the definitive bind after initialization.
+        try:
+            with socket.socket() as probe:
+                probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                probe.bind(('127.0.0.1', args.port))
+        except OSError as error:
+            if error.errno == errno.EADDRINUSE:
+                parser.error(f'Port {args.port} is already in use. Reuse the running simulator '
+                             '(browser/Isaac DASC panel), or stop that simulator before relaunching. '
+                             'No GPU model was loaded by this launch.')
+            parser.error(f'Cannot bind viewer port {args.port}: {error}')
     config = json.loads(args.config.read_text())
     if args.dynamics:
         config['dynamics_model'] = args.dynamics
@@ -303,10 +349,15 @@ def main():
         config.setdefault('randomization', {})['enabled'] = True
     if args.seed is not None:
         config['seed'] = args.seed
+    config['record_rgb_actions'] = args.dataset
+    if args.dataset and config['controller'].get('type') != 'nmpc':
+        parser.error('--dataset currently requires --controller nmpc with --dynamics quadrotor')
     if config.get('controller', {}).get('type', 'baseline') == 'mpc' and config.get('dynamics_model') != 'double_integrator':
         parser.error('MPC requires double_integrator. Use --controller baseline for other dynamics.')
-    if config.get('randomization', {}).get('enabled') and config.get('dynamics_model') != 'double_integrator':
-        parser.error('Randomization currently supports double_integrator only.')
+    if config.get('controller', {}).get('type') == 'nmpc' and config.get('dynamics_model') != 'quadrotor':
+        parser.error('NMPC requires --dynamics quadrotor.')
+    if config.get('randomization', {}).get('enabled') and config.get('dynamics_model') not in ('double_integrator', 'quadrotor'):
+        parser.error('Randomization supports double_integrator or quadrotor.')
     output = args.output or ROOT/'data/scene_20261025_200034/simulation'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')
     output.mkdir(parents=True, exist_ok=False)
     (output/'config.json').write_text(json.dumps(config, indent=2)+'\n')
@@ -332,6 +383,10 @@ def main():
                                                               type=type(error).__name__), indent=2)+'\n')
             raise
     runs = []
+    if args.pose_render_service:
+        from Workflow.Simulation.dataset import serve_pose_renderer
+        serve_pose_renderer(renderer, args.port, config)
+        return
     for i in range(args.episodes):
         episode_config = json.loads(json.dumps(config))
         episode_config['seed'] = int(config.get('seed', 42))+i

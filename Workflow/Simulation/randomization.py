@@ -111,6 +111,19 @@ def randomize_initial_state(metadata, settings, rng):
     )
 
 
+def randomize_quadrotor_dynamics(vehicle, settings, rng):
+    """Actual mass/drag/response vary; commands remain thrust N and body rad/s."""
+    nominal_mass = vehicle['mass_kg']
+    vehicle['max_thrust_n'] = vehicle.get('max_thrust_n', nominal_mass*vehicle.get('gravity_m_s2', 9.81)*vehicle.get('max_thrust_to_weight', 2.5))
+    vehicle['mass_kg'] *= float(sample_uniform(settings, rng, 'mass_scale', [.85, 1.15]))
+    vehicle['linear_drag_per_s'] = float(sample_uniform(settings, rng, 'linear_drag_per_s', [.05, .25]))
+    vehicle['thrust_scale'] = float(sample_uniform(settings, rng, 'thrust_scale', [.9, 1.1]))
+    vehicle['rate_scale'] = float(sample_uniform(settings, rng, 'rate_scale', [.9, 1.1]))
+    vehicle['rate_time_constant_s'] = float(sample_uniform(settings, rng, 'rate_time_constant_s', [.02, .06]))
+    vehicle['thrust_time_constant_s'] = float(sample_uniform(settings, rng, 'thrust_time_constant_s', [.02, .05]))
+    vehicle['acceleration_disturbance_m_s2'] = sample_uniform(settings, rng, 'acceleration_bias_m_s2', [-.1, .1], size=3).tolist()
+
+
 def sample_episode(config, rng):
     """Return (episode task, actual vehicle parameters, episode metadata).
 
@@ -132,12 +145,16 @@ def sample_episode(config, rng):
     if not enabled:
         return task, vehicle, metadata
 
-    if config.get('dynamics_model', 'quadrotor') != 'double_integrator':
-        raise ValueError('Episode randomization currently supports double_integrator only')
+    model = config.get('dynamics_model', 'quadrotor')
+    if model not in ('double_integrator', 'quadrotor'):
+        raise ValueError('Episode randomization supports double_integrator or quadrotor')
 
     # Sample in this order to preserve the results associated with existing seeds.
     route_offset, duration_scale = randomize_task(task, settings, rng)
-    randomize_dynamics(vehicle, settings, rng)
+    if model == 'quadrotor':
+        randomize_quadrotor_dynamics(vehicle, settings, rng)
+    else:
+        randomize_dynamics(vehicle, settings, rng)
     metadata['route_offset_m'] = route_offset
     metadata['duration_scale'] = duration_scale
     randomize_initial_state(metadata, settings, rng)

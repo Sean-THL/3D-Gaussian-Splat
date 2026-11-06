@@ -1,0 +1,2 @@
+# Install only in the project Python environment, not Isaac's bundled Python.
+casadi==3.6.6

@@ -20,10 +20,13 @@ class Simulator:
             raise ValueError(f'Unknown dynamics_model: {self.dynamics_model}')
         self.is_integrator = self.dynamics_model != 'quadrotor'
         self.controller_type = config.get('controller', {}).get('type', 'baseline')
-        if self.controller_type not in ('baseline', 'mpc'):
-            raise ValueError('controller.type must be baseline or mpc')
+        if self.controller_type not in ('baseline', 'mpc', 'nmpc'):
+            raise ValueError('controller.type must be baseline, mpc, or nmpc')
+        self.is_expert = self.controller_type in ('mpc', 'nmpc')
         if self.controller_type == 'mpc' and self.dynamics_model != 'double_integrator':
             raise ValueError('MPC currently requires --dynamics double_integrator; use --controller baseline for other models')
+        if self.controller_type == 'nmpc' and self.dynamics_model != 'quadrotor':
+            raise ValueError('NMPC requires --dynamics quadrotor')
         self.physics_dt = 1/float(config['physics_hz'])
         self.control_dt = 1/float(config['control_hz'])
         self.substeps = round(self.control_dt/self.physics_dt)
@@ -36,7 +39,7 @@ class Simulator:
     def reset(self):
         task, plant, sampled = sample_episode(self.config, self.rng)
         self.route = make_trajectory(task)
-        self.vehicle = Integrator(plant, self.dynamics_model) if self.is_integrator else Quadrotor(plant)
+        self.vehicle = self.make_vehicle(plant)
         initial_position = self.route.trajectory_function(0.)[:3]+sampled['initial_position_offset_m']
         if initial_position[2] <= self.vehicle.floor or min(p[2] for p in self.route.polyline(401)) <= self.vehicle.floor:
             raise ValueError('Sampled route/initial position crosses the assumed floor; revise randomization bounds')
@@ -45,15 +48,16 @@ class Simulator:
         self.controller = (LinearMPC(self.config.get('mpc', {}), self.config['vehicle'], self.control_dt)
                            if self.controller_type == 'mpc' else
                            IntegratorTracker(self.config['controller']) if self.is_integrator else TrackingController(self.config['controller']))
+        if self.controller_type == 'nmpc':
+            from Workflow.Simulation.control.quadrotor_mpc import QuadrotorMPC
+            self.controller = QuadrotorMPC(self.config.get('nmpc', {}), self.config['vehicle'], self.control_dt, self.physics_dt)
         self.episode_parameters = dict(episode=self.episode+1, seed=self.config.get('seed', 42),
                                        task=task, plant=plant, randomization=sampled,
-                                       expert_model='nominal ideal double integrator' if self.controller_type == 'mpc' else 'baseline feedback')
+                                       expert_model={'mpc': 'nominal ideal double integrator', 'nmpc': 'nominal thrust/body-rate quadrotor', 'baseline': 'baseline feedback'}[self.controller_type])
         self.time, self.route_time = 0., 0.
         self.mode, self.paused = 'route', True
         self.hover_target = self.state.position.copy()
         self.hover_yaw = self.route.yaw_reference(0.)[0]
-        if not self.is_integrator:
-            self.vehicle.wind[:] = 0.
         self.thrust = None if self.is_integrator else self.vehicle.mass*self.vehicle.gravity
         self.rates = np.zeros(3)
         self.translation_command, self.yaw_rate = np.zeros(3), 0.
@@ -71,15 +75,22 @@ class Simulator:
             return
         decision_time = self.time
         yaw, yaw_rate = self.yaw_reference()
-        if self.controller_type == 'mpc':
+        if self.is_expert:
             refs = self.reference_horizon(self.controller.horizon)
             action, rotation_action = self.controller.command_horizon(self.state, refs)
-            self.demonstrations.append(dict(time_s=self.time, episode=self.episode,
+            demonstration = dict(time_s=self.time, episode=self.episode,
                 position_m=self.state.position.tolist(), velocity_m_s=self.state.velocity.tolist(),
                 quaternion_xyzw=self.state.orientation.as_quat().tolist(),
                 reference_horizon=refs.tolist(), horizon_dt_s=self.control_dt,
-                action_acceleration_m_s2=action.tolist(), action_yaw_rate_rad_s=rotation_action,
-                solver=dict(self.controller.diagnostics)))
+                solver=dict(self.controller.diagnostics))
+            demonstration['observed_body_rates_rad_s'] = (self.state.body_rates.tolist() if self.state.body_rates is not None else [0., 0., 0.])
+            if self.controller_type == 'nmpc':
+                demonstration.update(action_type='thrust_body_rates', action_thrust_n=action,
+                                     action_body_rates_rad_s=rotation_action.tolist())
+            else:
+                demonstration.update(action_type='acceleration_yaw_rate', action_acceleration_m_s2=action.tolist(),
+                                     action_yaw_rate_rad_s=rotation_action)
+            self.demonstrations.append(demonstration)
         else:
             action, rotation_action = self.controller.command(
                 self.state, self.reference(), yaw, self.vehicle, yaw_rate=yaw_rate)
@@ -115,8 +126,8 @@ class Simulator:
             command_y=self.translation_command[1] if self.is_integrator else None,
             command_z=self.translation_command[2] if self.is_integrator else None))
         self.telemetry[-1].update(controller=self.controller_type,
-            mpc_solve_ms=self.controller.diagnostics['solve_ms'] if self.controller_type == 'mpc' else None,
-            mpc_status=self.controller.diagnostics['status'] if self.controller_type == 'mpc' else None)
+            mpc_solve_ms=self.controller.diagnostics['solve_ms'] if self.is_expert else None,
+            mpc_status=self.controller.diagnostics['status'] if self.is_expert else None)
         self.telemetry = self.telemetry[-20000:]
 
     def command(self, command):
@@ -194,8 +205,9 @@ class Simulator:
                     translation_command=self.translation_command.tolist() if self.is_integrator else None,
                     reference_yaw_rad=self.yaw_reference()[0], reference_yaw_rate_rad_s=self.yaw_reference()[1],
                     controller=self.controller_type,
-                    solver=dict(self.controller.diagnostics) if self.controller_type == 'mpc' else None,
+                    solver=dict(self.controller.diagnostics) if self.is_expert else None,
                     randomization_enabled=self.episode_parameters['randomization']['enabled'],
+                    episode_parameters=copy.deepcopy(self.episode_parameters), floor_z_m=self.vehicle.floor,
                     task=dict(self.route.config), route=self.route.polyline(), history=[p[:] for p in self.history])
 
     @property
@@ -216,3 +228,7 @@ class Simulator:
                 t = self.route_time+k*self.control_dt
                 rows.append(np.r_[self.route.trajectory_function(t), self.route.yaw_reference(t)[1]])
         return np.asarray(rows)
+
+    def make_vehicle(self, plant):
+        """Backend hook: native Isaac overrides the plant, not the MPC/reference."""
+        return Integrator(plant, self.dynamics_model) if self.is_integrator else Quadrotor(plant)
