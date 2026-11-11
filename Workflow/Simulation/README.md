@@ -1,5 +1,9 @@
 # Gaussian flight simulator
 
+**Start here:** [side-by-side commands for the custom and native Isaac simulators](START_HERE.md).
+
+The thrust/body-rate nonlinear MPC and native Isaac PhysX data backend are now implemented as a separate development profile. See [NATIVE_BACKEND.md](isaac_sim/NATIVE_BACKEND.md) for the backend comparison, validation limits, synchronized RGB/action format, and exact remote launch commands. The existing default double-integrator profile remains unchanged.
+
 A runnable local simulator couples selectable single-integrator, double-integrator, and FiGS-style quadrotor models to the existing native 3DGUT renderer. The default is now the double integrator. It provides a browser camera view, RGB/depth toggle, M-route tracking, telemetry, route settings, hover/nudge controls, and a disturbance button. Measured camera offsets can replace the candidate mount later.
 
 This is our prototype implementation of the lightweight approach. It does not install or invoke upstream FiGS/ACADOS. A constrained linear MPC expert now controls the double integrator; baseline trackers remain available for all models. Learned student training remains future work. Isaac Sim is not required.

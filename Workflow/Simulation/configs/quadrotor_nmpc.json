@@ -1,0 +1,172 @@
+{
+  "name": "Thrust/body-rate NMPC development profile",
+  "backend": "figs_style_3dgut",
+  "frame_convention": "Vicon world Z-up; virtual body right-handed X-forward Y-left Z-up. Candidate marker-camera mount is used as the virtual body-camera mount until independently measured.",
+  "physics_hz": 100,
+  "control_hz": 20,
+  "render_hz": 10,
+  "seed": 42,
+  "vehicle": {
+    "mass_kg": 0.87,
+    "gravity_m_s2": 9.81,
+    "linear_drag_per_s": 0.15,
+    "max_thrust_to_weight": 2.5,
+    "max_body_rate_rad_s": 4.0,
+    "floor_z_m": 0.0,
+    "max_speed_m_s": 1.0,
+    "max_acceleration_m_s2": 2.0,
+    "rate_time_constant_s": 0.04,
+    "thrust_time_constant_s": 0.03,
+    "inertia_kg_m2": [
+      0.0049,
+      0.0049,
+      0.0088
+    ],
+    "max_body_torque_nm": [
+      0.3,
+      0.3,
+      0.15
+    ]
+  },
+  "controller": {
+    "position_gain": 4.0,
+    "velocity_gain": 3.2,
+    "attitude_gain": 12.0,
+    "max_acceleration_m_s2": 2.0,
+    "type": "nmpc"
+  },
+  "task": {
+    "trajectory_type": "lissajous_figure8",
+    "center_xy_m": [
+      0.0,
+      0.0
+    ],
+    "width_m": 0.6,
+    "height_m": 0.6,
+    "altitude_m": 1.2,
+    "speed_m_s": 0.3,
+    "max_acceleration_m_s2": 0.5,
+    "yaw_deg": 0.0,
+    "hover_seconds": 1.0,
+    "duration_s": 20.0,
+    "vertical_drop_m": 0.0,
+    "max_angular_speed_rad_s": 0.75,
+    "angular_ramp_rate_per_s": 0.1,
+    "yaw_mode": "velocity_aligned"
+  },
+  "rendering": {
+    "tool_dir": "~/tools/3dgrut",
+    "width": 640,
+    "height": 360,
+    "alignment": "data/scene_20261025_200034/calibration/alignment_20261103T220923_264755Z/alignment.json",
+    "mount_override": null,
+    "checkpoint": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/ckpt_last.pt",
+    "camera_model": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/datasets/flight_20261025_native/undistorted/sparse/0/cameras.bin"
+  },
+  "limitations": [
+    "Development quadrotor NMPC; nominal parameters are not identified flight hardware.",
+    "Estimated camera mount and scene alignment remain provisional.",
+    "No collision-verified scene geometry; assumed floor only.",
+    "Local nonlinear optimization; no global-optimality or hard real-time guarantee.",
+    "No real-drone deployment interface or trained student."
+  ],
+  "dynamics_model": "quadrotor",
+  "mpc": {
+    "horizon_steps": 20,
+    "position_weight": 30.0,
+    "velocity_weight": 3.0,
+    "yaw_weight": 8.0,
+    "input_weight": 0.08,
+    "input_change_weight": 0.1,
+    "terminal_multiplier": 4.0,
+    "max_iterations": 150
+  },
+  "randomization": {
+    "enabled": false,
+    "x_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "y_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "z_offset_m": [
+      -0.1,
+      0.1
+    ],
+    "yaw_offset_deg": [
+      -15.0,
+      15.0
+    ],
+    "duration_scale": [
+      0.9,
+      1.1
+    ],
+    "initial_position_offset_m": [
+      -0.03,
+      0.03
+    ],
+    "initial_velocity_m_s": [
+      -0.03,
+      0.03
+    ],
+    "initial_yaw_offset_deg": [
+      -5.0,
+      5.0
+    ],
+    "acceleration_scale": [
+      0.8,
+      1.2
+    ],
+    "acceleration_bias_m_s2": [
+      -0.1,
+      0.1
+    ],
+    "velocity_damping_per_s": [
+      0.0,
+      0.15
+    ],
+    "yaw_rate_bias_rad_s": [
+      -0.02,
+      0.02
+    ],
+    "mass_scale": [
+      0.85,
+      1.15
+    ],
+    "linear_drag_per_s": [
+      0.05,
+      0.25
+    ],
+    "thrust_scale": [
+      0.9,
+      1.1
+    ],
+    "rate_scale": [
+      0.9,
+      1.1
+    ],
+    "rate_time_constant_s": [
+      0.02,
+      0.06
+    ],
+    "thrust_time_constant_s": [
+      0.02,
+      0.05
+    ]
+  },
+  "nmpc": {
+    "horizon_steps": 20,
+    "position_weight": 40.0,
+    "velocity_weight": 5.0,
+    "attitude_weight": 4.0,
+    "input_weight": 0.04,
+    "input_change_weight": 0.08,
+    "terminal_multiplier": 4.0,
+    "max_iterations": 150
+  },
+  "validation": {
+    "max_position_error_m": 0.2
+  }
+}

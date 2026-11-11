@@ -1,5 +1,6 @@
 """Render moving virtual camera poses with the existing native 3DGUT checkpoint."""
 import json
+import hashlib
 import sys
 from pathlib import Path
 
@@ -33,6 +34,7 @@ class GaussianRenderer:
 
         self.torch, self.Batch, self.to_gs = torch, Batch, vicon_body_to_gs
         calibration_path = root/config['alignment']
+        self.calibration_path = calibration_path
         self.calibration = json.loads(calibration_path.read_text())
         # Optional independently measured mount can replace the candidate estimate.
         if config.get('mount_override'):
@@ -69,6 +71,33 @@ class GaussianRenderer:
                                tangential_coeffs=np.zeros(2, dtype=np.float32),
                                thin_prism_coeffs=np.zeros(4, dtype=np.float32))
         self.device_name = torch.cuda.get_device_name(0)
+
+    @property
+    def metadata(self):
+        if not hasattr(self, '_metadata'):
+            digest = hashlib.sha256()
+            with Path(self.checkpoint).open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024*1024), b''):
+                    digest.update(chunk)
+            self._metadata = dict(renderer='native 3DGUT', gpu=self.device_name,
+                checkpoint=str(self.checkpoint), checkpoint_sha256=digest.hexdigest(),
+                alignment=str(self.calibration_path),
+                alignment_sha256=hashlib.sha256(self.calibration_path.read_bytes()).hexdigest(),
+                camera_to_body=self.calibration['camera_to_tracked_body'], gs_to_vicon=self.calibration['gs_to_vicon'],
+                intrinsics={k: v.tolist() if isinstance(v, np.ndarray) else v for k, v in self.intrinsics.items()},
+                width=self.width, height=self.height)
+        return self._metadata
+
+    def scene_preview(self, count=6000):
+        """Decimated Gaussian centers in Vicon metres, not surfaces/colliders."""
+        centers = self.model.get_positions()
+        stride = max(1, int(np.ceil(len(centers)/count)))
+        points = centers[::stride].detach().cpu().numpy()
+        alignment = self.calibration['gs_to_vicon']
+        points = alignment['scale_m_per_gs_unit']*(points@np.asarray(alignment['rotation_matrix']).T)
+        points += np.asarray(alignment['translation_m'])
+        points = points[np.isfinite(points).all(axis=1) & (np.abs(points) < 50.).all(axis=1)]
+        return dict(points_m=points.tolist(), kind='decimated Gaussian centers; visual proxy, not collision geometry')
 
     def render(self, state):
         torch = self.torch
