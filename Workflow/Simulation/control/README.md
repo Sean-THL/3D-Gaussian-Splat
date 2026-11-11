@@ -1,4 +1,15 @@
-# Linear MPC expert
+# Controllers
+
+The default expert is [quadrotor_mpc.py](quadrotor_mpc.py): nonlinear MPC with
+thrust/body-rate outputs and nominal rate/thrust response prediction. Its actual
+plant can be custom rigid-body integration or native Isaac PhysX. See
+[the backend/expert guide](../isaac_sim/NATIVE_BACKEND.md#expert-implementation).
+
+`tracker.py` is a separate baseline position/attitude tracker. `mpc.py` remains
+the linear double-integrator alternative described below; its acceleration
+labels are not interchangeable with thrust/body-rate labels.
+
+## Linear MPC alternative
 
 `mpc.py` is a nominal linear MPC for the existing **double-integrator position plus single-integrator yaw** plant. It does not control the simplified thrust/body-rate quadrotor. For the quadrotor expert, use the new `configs/quadrotor_nmpc.json` profile and `control/quadrotor_mpc.py`; see [the native/backend guide](../isaac_sim/NATIVE_BACKEND.md). Acceleration labels cannot be treated as thrust/body-rate labels.
 

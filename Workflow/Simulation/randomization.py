@@ -73,6 +73,8 @@ def randomize_task(task, settings, rng):
         task['angular_ramp_rate_per_s'] = task.get('angular_ramp_rate_per_s', 0.1) / duration_scale
     else:  # Figure eight: duration is specified directly in seconds.
         task['duration_s'] = task.get('duration_s', 20.0) * duration_scale
+    if trajectory_type != 'm' and task['duration_s'] < task.get('minimum_duration_s', 0.):
+        raise ValueError('Randomized duration is below task.minimum_duration_s; revise duration_scale')
 
     return route_offset.tolist(), duration_scale
 

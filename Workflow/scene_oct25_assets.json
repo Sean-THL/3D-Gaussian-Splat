@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "scene_id": "scene_20261025_200034",
+  "recording_id": "flight_rgbd_20261025_024629",
+  "organized_root": "data/scene_20261025_200034/organized",
+  "description": "Relative asset index and non-destructive descriptive symlink layout. Original paths remain authoritative.",
+  "evidence": {
+    "preparation": "Workflow/Reconstruction/datasets/flight_20261025_native/preparation.json",
+    "scene_manifest": "data/scene_20261025_200034/manifest.json",
+    "training_provenance": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/provenance.json"
+  },
+  "assets": [
+    {
+      "id": "raw_bag",
+      "name": "October 25 original RGB-D + Vicon recording",
+      "stage": "01_recording",
+      "path": "Workflow/Data/rosbags/flight_rgbd_20261025_024629",
+      "alias": "01_recording/original_rgbd_vicon_rosbag",
+      "description": "Immutable original recording used by reconstruction."
+    },
+    {
+      "id": "raw_bag_copy",
+      "name": "Verified scene-local rosbag copy",
+      "stage": "01_recording",
+      "path": "data/scene_20261025_200034/raw/flight_rgbd_20261025_024629",
+      "alias": "01_recording/scene_local_rosbag_copy",
+      "description": "A retained copy, not a second independent recording."
+    },
+    {
+      "id": "rgb_video",
+      "name": "Full RGB-only recording preview",
+      "stage": "01_recording",
+      "path": "Workflow/Data/exports/flight_rgbd_20261025_024629/native/video/rgb.mp4",
+      "alias": "01_recording/recording_rgb_preview.mp4",
+      "description": "Human preview; COLMAP did not read this video."
+    },
+    {
+      "id": "two_panel_video",
+      "name": "Original two-panel recording preview",
+      "stage": "01_recording",
+      "path": "data/scene_20261025_200034/raw/flight_rgbd_20261025_024629/flight_rgbd_20261025_024629_two_panel.mp4",
+      "alias": "01_recording/recording_two_panel_preview.mp4",
+      "description": "Human preview; not COLMAP input."
+    },
+    {
+      "id": "native_export",
+      "name": "Full decoded recording",
+      "stage": "01_recording",
+      "path": "Workflow/Data/exports/flight_rgbd_20261025_024629/native",
+      "alias": "01_recording/decoded_rgb_depth_vicon",
+      "description": "1009 RGB frames, 1010 measured-depth frames, calibration, timestamps and telemetry."
+    },
+    {
+      "id": "colmap_input",
+      "name": "296 original RGB reconstruction frames",
+      "stage": "02_colmap",
+      "path": "Workflow/Reconstruction/datasets/flight_20261025_native/images",
+      "alias": "02_colmap/input_rgb_296",
+      "description": "Direct rosbag extraction: 12\u2013130 seconds, up to 3 Hz, 1280\u00d7720."
+    },
+    {
+      "id": "rgb_timestamps",
+      "name": "Original timestamps for the 296 images",
+      "stage": "02_colmap",
+      "path": "Workflow/Reconstruction/datasets/flight_20261025_native/source_export/rgb/timestamps.csv",
+      "alias": "02_colmap/input_rgb_timestamps.csv",
+      "description": "Source time associations used by alignment."
+    },
+    {
+      "id": "colmap_original",
+      "name": "COLMAP original sparse model",
+      "stage": "02_colmap",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/datasets/flight_20261025_native/colmap",
+      "alias": "02_colmap/original_colmap",
+      "description": "Database, matching/mapping logs, provenance and sparse/0 cameras/images/points3D.bin."
+    },
+    {
+      "id": "undistorted",
+      "name": "Undistorted training input + cameras",
+      "stage": "02_colmap",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/datasets/flight_20261025_native/undistorted",
+      "alias": "02_colmap/undistorted_training_dataset",
+      "description": "296 undistorted images and PINHOLE camera model used by 3DGUT."
+    },
+    {
+      "id": "shared_selection",
+      "name": "Independent reusable frame/depth index",
+      "stage": "02_colmap",
+      "path": "Workflow/Reconstruction/datasets/oct25_shared_native",
+      "alias": "02_colmap/shared_rgb_depth_selection",
+      "description": "296 selected frames, 183 depth matches within 40 ms; not the original trainer directory."
+    },
+    {
+      "id": "final_ply",
+      "name": "Confirmed final Gaussian PLY export",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/export_last.ply",
+      "alias": "03_gaussian_scene/final_scene_gaussians.ply",
+      "description": "500000 Gaussian primitives; visualization/export asset, not a collision mesh.",
+      "sha256": "9791f10202f8fe3a958efd2690543ba580ff6f1a6b4278a6a67809896d2ed88e"
+    },
+    {
+      "id": "checkpoint",
+      "name": "Active native-renderer checkpoint",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/ckpt_last.pt",
+      "alias": "03_gaussian_scene/scene_renderer_checkpoint.pt",
+      "description": "Actual model loaded by both custom and Isaac 3DGUT rendering."
+    },
+    {
+      "id": "selected_ply",
+      "name": "Originally selected download",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/reconstruction/scene_20261025_200034(1).ply",
+      "alias": "03_gaussian_scene/original_selected_ply.ply",
+      "description": "Byte-identical to final_scene_gaussians.ply.",
+      "sha256": "9791f10202f8fe3a958efd2690543ba580ff6f1a6b4278a6a67809896d2ed88e"
+    },
+    {
+      "id": "training_run",
+      "name": "Successful 3DGUT training run",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z",
+      "alias": "03_gaussian_scene/training_run",
+      "description": "Provenance, training log, checkpoint, PLY and saved renders."
+    },
+    {
+      "id": "visual_metrics",
+      "name": "Trainer held-out RGB metrics",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/metrics.json",
+      "alias": "03_gaussian_scene/heldout_rgb_metrics.json",
+      "description": "37 every-eighth held-out appearance views; COLMAP itself used all 296 images."
+    },
+    {
+      "id": "gs_preview",
+      "name": "Saved reconstruction preview video",
+      "stage": "03_gaussian_scene",
+      "path": "data/scene_20261025_200034/training_reference/Workflow/Reconstruction/runs/flight_20261025_native_20261025T215743_160060Z/model/flight_20261025_native/undistorted-2510_175936/reconstruction_preview.mp4",
+      "alias": "03_gaussian_scene/trained_scene_preview.mp4",
+      "description": "Output preview of the trained scene; not a source video for COLMAP."
+    },
+    {
+      "id": "alignment",
+      "name": "Pinned candidate Vicon/3DGS calibration",
+      "stage": "04_alignment",
+      "path": "data/scene_20261025_200034/calibration/alignment_20261103T220923_264755Z/alignment.json",
+      "alias": "04_alignment/vicon_3dgs_alignment_candidate.json",
+      "description": "Scale, forward/inverse mappings, camera mount and time offset; mount not independently measured."
+    },
+    {
+      "id": "alignment_plot",
+      "name": "Alignment trajectory/residual figure",
+      "stage": "04_alignment",
+      "path": "data/scene_20261025_200034/calibration/alignment_20261103T220923_264755Z/alignment_overview.png",
+      "alias": "04_alignment/alignment_validation.png",
+      "description": "Recorded camera trajectory alignment consistency, not Gaussian surface accuracy."
+    },
+    {
+      "id": "depth_report",
+      "name": "Completed geometry-fidelity report",
+      "stage": "05_fidelity",
+      "path": "data/scene_20261025_200034/evaluation/depth_20261103T041136_791961Z/summary.json",
+      "alias": "05_fidelity/gaussian_vs_sensor_depth.json",
+      "description": "25 views; median absolute camera-Z difference ~0.369 m."
+    },
+    {
+      "id": "depth_plot",
+      "name": "Depth comparison overview",
+      "stage": "05_fidelity",
+      "path": "data/scene_20261025_200034/evaluation/depth_20261103T041136_791961Z/overview.jpg",
+      "alias": "05_fidelity/depth_comparison.jpg",
+      "description": "Measured versus rendered camera-Z depth."
+    },
+    {
+      "id": "custom_runs",
+      "name": "Custom simulator run archive",
+      "stage": "06_simulation",
+      "path": "data/scene_20261025_200034/simulation",
+      "alias": "06_simulation/custom_runs",
+      "description": "Each timestamp is a separate experiment; old baseline runs remain historical."
+    },
+    {
+      "id": "isaac_runs",
+      "name": "Native Isaac run archive",
+      "stage": "06_simulation",
+      "path": "data/scene_20261025_200034/isaac_sim",
+      "alias": "06_simulation/isaac_runs",
+      "description": "Run reports, episodes, RGB and expert labels; new remote runs must be copied separately."
+    },
+    {
+      "id": "pilot",
+      "name": "Confirmed native training-data pilot",
+      "stage": "06_simulation",
+      "path": "data/scene_20261025_200034/isaac_sim/pilot_20261110T164842Z",
+      "alias": "06_simulation/pilot_seed1000_seed1001",
+      "description": "443 + 407 synchronized pairs; full PhysX plant, thrust/body-rate NMPC."
+    },
+    {
+      "id": "pilot_video_1000",
+      "name": "Audited native pilot video: seed 1000",
+      "stage": "06_simulation",
+      "path": "data/scene_20261025_200034/isaac_sim/pilot_20261110T164842Z/episode_0001/visualization/rollout.mp4",
+      "alias": "06_simulation/pilot_seed1000_rgb_and_controls.mp4",
+      "description": "Visualization generated locally from saved states/images, not automatically uploaded."
+    },
+    {
+      "id": "pilot_paths",
+      "name": "Recorded randomized-route comparison",
+      "stage": "06_simulation",
+      "path": "data/scene_20261025_200034/isaac_sim/pilot_20261110T164842Z/randomized_trajectories.png",
+      "alias": "06_simulation/pilot_randomized_trajectories.png",
+      "description": "Dashed reference paths versus solid achieved trajectories."
+    }
+  ]
+}

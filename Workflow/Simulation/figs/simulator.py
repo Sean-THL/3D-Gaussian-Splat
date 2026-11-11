@@ -54,6 +54,8 @@ class Simulator:
         self.episode_parameters = dict(episode=self.episode+1, seed=self.config.get('seed', 42),
                                        task=task, plant=plant, randomization=sampled,
                                        expert_model={'mpc': 'nominal ideal double integrator', 'nmpc': 'nominal thrust/body-rate quadrotor', 'baseline': 'baseline feedback'}[self.controller_type])
+        self.episode_parameters['physics_backend'] = getattr(self.vehicle, 'physics_backend',
+            'custom_'+self.dynamics_model)
         self.time, self.route_time = 0., 0.
         self.mode, self.paused = 'route', True
         self.hover_target = self.state.position.copy()
@@ -164,6 +166,7 @@ class Simulator:
             ranges = dict(width_m=(.1, 2.), height_m=(.1, 2.), altitude_m=(.2, 8.),
                           speed_m_s=(.05, 1.), yaw_deg=(-180., 180.), duration_s=(5., 120.),
                           vertical_drop_m=(0., 2.), max_angular_speed_rad_s=(.05, 2.))
+            ranges['duration_s'] = (max(5., self.config['task'].get('minimum_duration_s', 0.)), 120.)
             values = command.get('task', {})
             update = {}
             for key, value in values.items():
@@ -202,6 +205,7 @@ class Simulator:
                     tracking_error_m=float(np.linalg.norm(self.state.position-reference)),
                     thrust_n=self.thrust, body_rates_rad_s=self.rates.tolist(),
                     dynamics_model=self.dynamics_model, command_units=self.command_units,
+                    physics_backend=self.episode_parameters['physics_backend'],
                     translation_command=self.translation_command.tolist() if self.is_integrator else None,
                     reference_yaw_rad=self.yaw_reference()[0], reference_yaw_rate_rad_s=self.yaw_reference()[1],
                     controller=self.controller_type,
@@ -231,4 +235,12 @@ class Simulator:
 
     def make_vehicle(self, plant):
         """Backend hook: native Isaac overrides the plant, not the MPC/reference."""
-        return Integrator(plant, self.dynamics_model) if self.is_integrator else Quadrotor(plant)
+        if self.is_integrator:
+            return Integrator(plant, self.dynamics_model)
+        model = plant.get('rotation_model', 'rate_response')
+        if model == 'rigid_body':
+            from Workflow.Simulation.figs.rigid_body import RigidBodyQuadrotor
+            return RigidBodyQuadrotor(plant)
+        if model != 'rate_response':
+            raise ValueError('vehicle.rotation_model must be rate_response or rigid_body')
+        return Quadrotor(plant)

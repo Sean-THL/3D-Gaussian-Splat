@@ -294,7 +294,7 @@ def headless(app, duration, record):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', type=Path, default=ROOT/'Workflow/Simulation/configs/demo.json')
+    parser.add_argument('--config', type=Path, default=ROOT/'Workflow/Simulation/configs/quadrotor_nmpc.json')
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--headless', action='store_true')
     parser.add_argument('--duration', type=float, default=0., help='0 runs the full task plus settling time')
@@ -304,6 +304,8 @@ def main():
     parser.add_argument('--no-render', action='store_true', help='CPU dynamics only; no Gaussian image')
     parser.add_argument('--dynamics', choices=['single_integrator', 'double_integrator', 'quadrotor'],
                         help='Override the configured vehicle model')
+    parser.add_argument('--quadrotor-plant', choices=['rate_response', 'rigid_body'],
+                        help='Custom quadrotor rotation: response approximation or force/torque rigid body')
     parser.add_argument('--yaw-mode', choices=['constant', 'velocity_aligned'], help='Reference heading mode')
     parser.add_argument('--controller', choices=['baseline', 'mpc', 'nmpc'], help='Reference tracking controller')
     parser.add_argument('--randomize', action='store_true', help='Sample task and plant settings on each reset')
@@ -339,6 +341,10 @@ def main():
     config = json.loads(args.config.read_text())
     if args.dynamics:
         config['dynamics_model'] = args.dynamics
+    if args.quadrotor_plant:
+        config['vehicle']['rotation_model'] = args.quadrotor_plant
+        if config['dynamics_model'] != 'quadrotor':
+            parser.error('--quadrotor-plant requires quadrotor dynamics')
     if args.yaw_mode:
         config['task']['yaw_mode'] = args.yaw_mode
     if args.trajectory:

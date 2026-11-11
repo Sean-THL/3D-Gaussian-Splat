@@ -1,5 +1,9 @@
 # Extract data from a rosbag
 
+For the current October 25 simulation scene, use the recording and asset identities
+in [PROJECT_MAP.md](../PROJECT_MAP.md#1-which-recording-belongs-to-this-scene).
+The October 13 export described below is an older dataset, not the active scene's source.
+
 For multiple reconstruction methods, use [the reusable dataset workflow](../DATASET_WORKFLOW.md): export native data once, then run `dataset_tools.py select` and `dataset_tools.py variant`. The new tool adjusts intrinsics with resizing/cropping, optionally associates aligned measured depth with explicit timestamp tolerances, and records frame IDs/reference splits. It uses this folder's existing `.venv` and requirements.
 
 This folder contains the copied flight bag, `extract_rosbag.py`, and the message definitions needed to decode its PX4 topics. The original `Gaussian_Splat/rosbag` is unchanged.

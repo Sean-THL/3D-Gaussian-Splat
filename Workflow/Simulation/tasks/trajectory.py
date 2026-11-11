@@ -104,6 +104,9 @@ class AnalyticTrajectory(TimeTrajectory):
         self.duration = float(config.get('duration_s', 20.))
         if self.start.shape != (3,) or not np.isfinite(self.start).all() or not np.isfinite(self.duration) or self.duration <= 0:
             raise ValueError('Analytic reference needs a finite XYZ start and positive duration')
+        minimum = float(config.get('minimum_duration_s', 0.))
+        if not np.isfinite(minimum) or minimum < 0 or self.duration < minimum:
+            raise ValueError(f'Trajectory duration must be at least {minimum:g} seconds')
 
 
 class HorizontalCircle(AnalyticTrajectory):

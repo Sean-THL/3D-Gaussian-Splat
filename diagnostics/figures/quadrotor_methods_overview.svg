@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="792pt" viewBox="0 0 1152 792" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-09T17:01:41.163607</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.8.4, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 792
+L 1152 792
+L 1152 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 74.69568 223.32024
+L 524.34432 223.32024
+Q 532.84608 223.32024 532.84608 215.76456
+L 532.84608 151.96104
+Q 532.84608 144.40536 524.34432 144.40536
+L 74.69568 144.40536
+Q 66.19392 144.40536 66.19392 151.96104
+L 66.19392 215.76456
+Q 66.19392 223.32024 74.69568 223.32024
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 299.52 224.901514
+Q 299.52 233.815204 299.52 240.940039
+" clip-path="url(#p0b6bc2dfc8)" style="fill: none; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 302.32 235.340039
+L 299.52 240.940039
+L 296.72 235.340039
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #2979bf; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 74.69568 321.96384
+L 524.34432 321.96384
+Q 532.84608 321.96384 532.84608 314.40816
+L 532.84608 250.60464
+Q 532.84608 243.04896 524.34432 243.04896
+L 74.69568 243.04896
+Q 66.19392 243.04896 66.19392 250.60464
+L 66.19392 314.40816
+Q 66.19392 321.96384 74.69568 321.96384
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 299.52 323.545114
+Q 299.52 332.458804 299.52 339.583639
+" clip-path="url(#p0b6bc2dfc8)" style="fill: none; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 302.32 333.983639
+L 299.52 339.583639
+L 296.72 333.983639
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #2979bf; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 74.69568 420.60744
+L 524.34432 420.60744
+Q 532.84608 420.60744 532.84608 413.05176
+L 532.84608 349.24824
+Q 532.84608 341.69256 524.34432 341.69256
+L 74.69568 341.69256
+Q 66.19392 341.69256 66.19392 349.24824
+L 66.19392 413.05176
+Q 66.19392 420.60744 74.69568 420.60744
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 299.52 422.188714
+Q 299.52 431.102404 299.52 438.227239
+" clip-path="url(#p0b6bc2dfc8)" style="fill: none; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 302.32 432.627239
+L 299.52 438.227239
+L 296.72 432.627239
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #2979bf; stroke: #2979bf; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 74.69568 519.25104
+L 524.34432 519.25104
+Q 532.84608 519.25104 532.84608 511.69536
+L 532.84608 447.89184
+Q 532.84608 440.33616 524.34432 440.33616
+L 74.69568 440.33616
+Q 66.19392 440.33616 66.19392 447.89184
+L 66.19392 511.69536
+Q 66.19392 519.25104 74.69568 519.25104
+z
+" clip-path="url(#p0b6bc2dfc8)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="fill: #2979bf; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="63.36" y="89.4168" transform="rotate(-0 63.36 89.4168)">A  |  EXISTING CUSTOM PLANT</text>
+   </g>
+   <g id="text_2">
+    <text style="fill: #19334c; font: 700 15px 'DejaVu Sans'; text-anchor: start" x="63.36" y="114.6024" transform="rotate(-0 63.36 114.6024)">Simplified thrust / body-rate dynamics</text>
+   </g>
+   <g id="text_3">
+    <text style="fill: #2979bf; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="173.615802" transform="rotate(-0 82.2528 173.615802)">Quadrotor NMPC</text>
+   </g>
+   <g id="text_4">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="201.607607" transform="rotate(-0 82.2528 201.607607)">Reference + current state → thrust T and body rates p, q, r</text>
+   </g>
+   <g id="text_5">
+    <text style="fill: #2979bf; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="272.259402" transform="rotate(-0 82.2528 272.259402)">Approximate actuator response</text>
+   </g>
+   <g id="text_6">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="300.251207" transform="rotate(-0 82.2528 300.251207)">Body-rate command → achieved rates through a response lag</text>
+   </g>
+   <g id="text_7">
+    <text style="fill: #2979bf; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="370.903002" transform="rotate(-0 82.2528 370.903002)">Update orientation and translation</text>
+   </g>
+   <g id="text_8">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="398.894807" transform="rotate(-0 82.2528 398.894807)">Integrate achieved rates; thrust points along body +Z</text>
+   </g>
+   <g id="text_9">
+    <text style="fill: #2979bf; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="469.499727" transform="rotate(-0 82.2528 469.499727)">Render from the resulting camera pose</text>
+   </g>
+   <g id="text_10">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="82.2528" y="497.538407" transform="rotate(-0 82.2528 497.538407)">Actual position + roll / pitch / yaw + fixed camera mount</text>
+   </g>
+   <g id="text_11">
+    <text style="fill: #2979bf; font: 10px 'DejaVu Sans'; text-anchor: middle" x="299.52" y="570.042" transform="rotate(-0 299.52 570.042)">Feed the resulting state back to the next MPC decision</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_9">
+    <path d="M 627.65568 223.32024
+L 1077.30432 223.32024
+Q 1085.80608 223.32024 1085.80608 215.76456
+L 1085.80608 151.96104
+Q 1085.80608 144.40536 1077.30432 144.40536
+L 627.65568 144.40536
+Q 619.15392 144.40536 619.15392 151.96104
+L 619.15392 215.76456
+Q 619.15392 223.32024 627.65568 223.32024
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 852.48 224.901514
+Q 852.48 233.815204 852.48 240.940039
+" clip-path="url(#pcd4e3d24a1)" style="fill: none; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 855.28 235.340039
+L 852.48 240.940039
+L 849.68 235.340039
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #119c87; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 627.65568 321.96384
+L 1077.30432 321.96384
+Q 1085.80608 321.96384 1085.80608 314.40816
+L 1085.80608 250.60464
+Q 1085.80608 243.04896 1077.30432 243.04896
+L 627.65568 243.04896
+Q 619.15392 243.04896 619.15392 250.60464
+L 619.15392 314.40816
+Q 619.15392 321.96384 627.65568 321.96384
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 852.48 323.545114
+Q 852.48 332.458804 852.48 339.583639
+" clip-path="url(#pcd4e3d24a1)" style="fill: none; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 855.28 333.983639
+L 852.48 339.583639
+L 849.68 333.983639
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #119c87; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 627.65568 420.60744
+L 1077.30432 420.60744
+Q 1085.80608 420.60744 1085.80608 413.05176
+L 1085.80608 349.24824
+Q 1085.80608 341.69256 1077.30432 341.69256
+L 627.65568 341.69256
+Q 619.15392 341.69256 619.15392 349.24824
+L 619.15392 413.05176
+Q 619.15392 420.60744 627.65568 420.60744
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 852.48 422.188714
+Q 852.48 431.102404 852.48 438.227239
+" clip-path="url(#pcd4e3d24a1)" style="fill: none; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 855.28 432.627239
+L 852.48 438.227239
+L 849.68 432.627239
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #119c87; stroke: #119c87; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 627.65568 519.25104
+L 1077.30432 519.25104
+Q 1085.80608 519.25104 1085.80608 511.69536
+L 1085.80608 447.89184
+Q 1085.80608 440.33616 1077.30432 440.33616
+L 627.65568 440.33616
+Q 619.15392 440.33616 619.15392 447.89184
+L 619.15392 511.69536
+Q 619.15392 519.25104 627.65568 519.25104
+z
+" clip-path="url(#pcd4e3d24a1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_12">
+    <text style="fill: #119c87; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="616.32" y="89.4168" transform="rotate(-0 616.32 89.4168)">B  |  EXISTING NATIVE ISAAC PLANT</text>
+   </g>
+   <g id="text_13">
+    <text style="fill: #19334c; font: 700 15px 'DejaVu Sans'; text-anchor: start" x="616.32" y="114.6024" transform="rotate(-0 616.32 114.6024)">Rigid-body dynamics with inertia</text>
+   </g>
+   <g id="text_14">
+    <text style="fill: #119c87; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="173.615802" transform="rotate(-0 635.2128 173.615802)">Quadrotor NMPC</text>
+   </g>
+   <g id="text_15">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="201.607607" transform="rotate(-0 635.2128 201.607607)">Reference + current state → thrust T and body rates p, q, r</text>
+   </g>
+   <g id="text_16">
+    <text style="fill: #119c87; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="272.212527" transform="rotate(-0 635.2128 272.212527)">Body-rate tracking controller</text>
+   </g>
+   <g id="text_17">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="300.251207" transform="rotate(-0 635.2128 300.251207)">Rate error → bounded torque; thrust also has response lag</text>
+   </g>
+   <g id="text_18">
+    <text style="fill: #119c87; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="370.856127" transform="rotate(-0 635.2128 370.856127)">PhysX integrates forces and torques</text>
+   </g>
+   <g id="text_19">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="398.894807" transform="rotate(-0 635.2128 398.894807)">Inertia determines rotation; tilted thrust changes translation</text>
+   </g>
+   <g id="text_20">
+    <text style="fill: #119c87; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="469.499727" transform="rotate(-0 635.2128 469.499727)">Render from the resulting camera pose</text>
+   </g>
+   <g id="text_21">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="635.2128" y="497.538407" transform="rotate(-0 635.2128 497.538407)">Actual position + roll / pitch / yaw + fixed camera mount</text>
+   </g>
+   <g id="text_22">
+    <text style="fill: #119c87; font: 10px 'DejaVu Sans'; text-anchor: middle" x="852.48" y="570.042" transform="rotate(-0 852.48 570.042)">Feed the resulting state back to the next MPC decision</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_16">
+    <path d="M 96.878769 693.15444
+L 300.948923 693.15444
+Q 318.694154 693.15444 318.694154 691.65756
+L 318.694154 634.94244
+Q 318.694154 633.44556 300.948923 633.44556
+L 96.878769 633.44556
+Q 79.133538 633.44556 79.133538 634.94244
+L 79.133538 691.65756
+Q 79.133538 693.15444 96.878769 693.15444
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 316.748456 663.3
+Q 324.606608 663.3 330.675907 663.3
+" clip-path="url(#p97104b1fd1)" style="fill: none; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 325.075907 660.5
+L 330.675907 663.3
+L 325.075907 666.1
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #db8c35; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 348.269538 693.15444
+L 552.339692 693.15444
+Q 570.084923 693.15444 570.084923 691.65756
+L 570.084923 634.94244
+Q 570.084923 633.44556 552.339692 633.44556
+L 348.269538 633.44556
+Q 330.524308 633.44556 330.524308 634.94244
+L 330.524308 691.65756
+Q 330.524308 693.15444 348.269538 693.15444
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 568.139225 663.3
+Q 575.997377 663.3 582.066676 663.3
+" clip-path="url(#p97104b1fd1)" style="fill: none; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 576.466676 660.5
+L 582.066676 663.3
+L 576.466676 666.1
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #db8c35; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 599.660308 693.15444
+L 803.730462 693.15444
+Q 821.475692 693.15444 821.475692 691.65756
+L 821.475692 634.94244
+Q 821.475692 633.44556 803.730462 633.44556
+L 599.660308 633.44556
+Q 581.915077 633.44556 581.915077 634.94244
+L 581.915077 691.65756
+Q 581.915077 693.15444 599.660308 693.15444
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 819.529994 663.3
+Q 827.388147 663.3 833.457445 663.3
+" clip-path="url(#p97104b1fd1)" style="fill: none; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 827.857445 660.5
+L 833.457445 663.3
+L 827.857445 666.1
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #db8c35; stroke: #db8c35; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 851.051077 693.15444
+L 1055.121231 693.15444
+Q 1072.866462 693.15444 1072.866462 691.65756
+L 1072.866462 634.94244
+Q 1072.866462 633.44556 1055.121231 633.44556
+L 851.051077 633.44556
+Q 833.305846 633.44556 833.305846 634.94244
+L 833.305846 691.65756
+Q 833.305846 693.15444 851.051077 693.15444
+z
+" clip-path="url(#p97104b1fd1)" style="fill: #f7fafc; stroke: #dce5ec; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_23">
+    <text style="fill: #db8c35; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="112.652308" y="655.55097" transform="rotate(-0 112.652308 655.55097)">Linear MPC</text>
+   </g>
+   <g id="text_24">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="112.652308" y="678.283895" transform="rotate(-0 112.652308 678.283895)">XYZ acceleration + yaw</text>
+   </g>
+   <g id="text_25">
+    <text style="fill: #db8c35; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="364.043077" y="655.55097" transform="rotate(-0 364.043077 655.55097)">Geometric controller</text>
+   </g>
+   <g id="text_26">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="364.043077" y="678.283895" transform="rotate(-0 364.043077 678.283895)">Desired tilt → thrust / rates</text>
+   </g>
+   <g id="text_27">
+    <text style="fill: #db8c35; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="615.433846" y="655.55097" transform="rotate(-0 615.433846 655.55097)">Quadrotor plant</text>
+   </g>
+   <g id="text_28">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="615.433846" y="678.283895" transform="rotate(-0 615.433846 678.283895)">Orientation + translation</text>
+   </g>
+   <g id="text_29">
+    <text style="fill: #db8c35; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="866.824615" y="655.55097" transform="rotate(-0 866.824615 655.55097)">Camera renderer</text>
+   </g>
+   <g id="text_30">
+    <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="866.824615" y="678.283895" transform="rotate(-0 866.824615 678.283895)">RGB from actual pose</text>
+   </g>
+  </g>
+  <g id="text_31">
+   <text style="fill: #19334c; font: 700 26px 'DejaVu Sans'; text-anchor: start" x="63.36" y="39.6" transform="rotate(-0 63.36 39.6)">Two ways to simulate a tilting drone</text>
+  </g>
+  <g id="text_32">
+   <text style="fill: #667e91; font: 13px 'DejaVu Sans'; text-anchor: start" x="63.36" y="71.28" transform="rotate(-0 63.36 71.28)">Both update full orientation. The difference is how rotation responds to a command.</text>
+  </g>
+  <g id="text_33">
+   <text style="fill: #db8c35; font: 700 13px 'DejaVu Sans'; text-anchor: start" x="63.36" y="594" transform="rotate(-0 63.36 594)">YOUR PROPOSAL  |  change the planner, retain a quadrotor plant</text>
+  </g>
+  <g id="text_34">
+   <text style="fill: #19334c; font: 11px 'DejaVu Sans'; text-anchor: start" x="63.36" y="740.52" transform="rotate(-0 63.36 740.52)">Same principle in all cases: render the achieved camera pose, rather than a level pose placed on the reference path.</text>
+  </g>
+  <g id="text_35">
+   <text style="fill: #667e91; font: 10px 'DejaVu Sans'; text-anchor: start" x="63.36" y="766.656" transform="rotate(-0 63.36 766.656)">Conceptual architecture • The proposed linear-MPC / geometric-controller combination is not yet wired into our simulator.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p0b6bc2dfc8">
+   <rect x="63.36" y="118.8" width="472.32" height="419.76"/>
+  </clipPath>
+  <clipPath id="pcd4e3d24a1">
+   <rect x="616.32" y="118.8" width="472.32" height="419.76"/>
+  </clipPath>
+  <clipPath id="p97104b1fd1">
+   <rect x="63.36" y="621.72" width="1025.28" height="83.16"/>
+  </clipPath>
+ </defs>
+</svg>

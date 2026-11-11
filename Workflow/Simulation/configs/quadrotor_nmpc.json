@@ -7,6 +7,8 @@
   "render_hz": 10,
   "seed": 42,
   "vehicle": {
+    "rotation_model": "rigid_body",
+    "rigid_body_max_step_s": 0.001,
     "mass_kg": 0.87,
     "gravity_m_s2": 9.81,
     "linear_drag_per_s": 0.15,
@@ -48,7 +50,8 @@
     "max_acceleration_m_s2": 0.5,
     "yaw_deg": 0.0,
     "hover_seconds": 1.0,
-    "duration_s": 20.0,
+    "duration_s": 30.0,
+    "minimum_duration_s": 30.0,
     "vertical_drop_m": 0.0,
     "max_angular_speed_rad_s": 0.75,
     "angular_ramp_rate_per_s": 0.1,
@@ -100,7 +103,7 @@
       15.0
     ],
     "duration_scale": [
-      0.9,
+      1.0,
       1.1
     ],
     "initial_position_offset_m": [

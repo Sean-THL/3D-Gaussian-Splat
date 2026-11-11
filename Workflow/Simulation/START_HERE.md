@@ -1,5 +1,8 @@
 # Run the two simulators
 
+To browse or download completed runs and generate result videos/trajectory plots,
+see [RESULTS.md](RESULTS.md).
+
 Both workflows run on `tk@141.212.76.61` in:
 
 ```text
@@ -102,6 +105,17 @@ Do not run `run_live_bridge.sh` for native physics: that is the older visualizer
 for the custom server. It shares WebRTC port 49100 with the native viewer.
 
 ## Configuration and collection
+
+The default custom-simulator profile is now `configs/quadrotor_nmpc.json`:
+custom rigid-body dynamics with thrust/body-rate NMPC. Use
+`--quadrotor-plant rate_response` for the earlier simplified custom model.
+The double-integrator profile
+remains selectable with `--config Workflow/Simulation/configs/demo.json`.
+The A-to-B linear-MPC/geometric-controller experiment remains a separate
+demonstration in `animate_ab_flight.py`; it is not a production dataset mode.
+
+For the custom simulator's pilot, batch collection, auditing and seed splits,
+follow [DATA_COLLECTION.md](DATA_COLLECTION.md).
 
 Edit `Workflow/Simulation/configs/quadrotor_nmpc.json` to change reference,
 vehicle/actuator parameters, nonlinear MPC weights, and randomization bounds.

@@ -8,8 +8,8 @@ The previous double-integrator linear MPC remains available independently.
 
 | Aspect | Custom quadrotor + 3DGUT | Native Isaac PhysX + 3DGUT |
 | --- | --- | --- |
-| Dynamics | Quaternion translation/rotation integration with nominal/actual actuator response | Native rigid-body integration with mass, inertia, force, torque, and contact |
-| Rate command response | Configurable first-order response | Torque-limited body-rate feedback loop on the physical rigid body |
+| Dynamics | Numerical force/torque rigid body by default; earlier rate-response model remains selectable | Native rigid-body integration with mass, inertia, force, torque, and contact |
+| Rate command response | Torque-limited rate loop; `--quadrotor-plant rate_response` selects the earlier approximation | Torque-limited body-rate feedback loop on the physical rigid body |
 | Scene image | Native CUDA 3DGUT | Same CUDA 3DGUT in a separate pose-render process |
 | Contacts | Assumed floor clamp | PhysX floor/body contact |
 | Room obstacles | Visual only | Visual only; no verified room collision model yet |

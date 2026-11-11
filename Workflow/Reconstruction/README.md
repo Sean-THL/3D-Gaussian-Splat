@@ -1,5 +1,10 @@
 # Mono RGB baseline: COLMAP → 3DGUT
 
+For the already completed October 25 scene, see [the current project map](../PROJECT_MAP.md#2-which-mp4-was-used-for-colmap)
+and [named model assets](../../data/scene_20261025_200034/organized/README.md).
+Its COLMAP input was 296 PNGs extracted directly from the rosbag, not an MP4.
+The instructions below describe rebuilding or running additional experiments.
+
 Preferred for new multi-method experiments: [export once, select shared frames, then derive calibrated variants](../DATASET_WORKFLOW.md). These datasets work with the COLMAP launcher below. `prepare --export PATH` selects from a native export; `prepare --bag PATH` retains the older extraction-plus-preparation behavior.
 
 For the new full-resolution recording, use [the October 25 run instructions](OCT25_RECONSTRUCTION.md). This run targets a Gaussian reconstruction result.

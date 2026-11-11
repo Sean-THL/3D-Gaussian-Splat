@@ -9,6 +9,7 @@
 /Workflow/Reconstruction/runs/
 /Workflow/Reconstruction/cache/
 /Workflow/Reconstruction/logs/
+/diagnostics/videos/
 *.bag
 *.db3
 *.db3-shm
