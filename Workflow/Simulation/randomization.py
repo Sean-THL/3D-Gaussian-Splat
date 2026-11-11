@@ -142,6 +142,8 @@ def sample_episode(config, rng):
         'initial_position_offset_m': [0.0, 0.0, 0.0],
         'initial_velocity_m_s': [0.0, 0.0, 0.0],
         'initial_yaw_offset_deg': 0.0,
+        'initial_roll_offset_deg': 0.0,
+        'initial_pitch_offset_deg': 0.0,
     }
 
     if not enabled:
@@ -160,5 +162,22 @@ def sample_episode(config, rng):
     metadata['route_offset_m'] = route_offset
     metadata['duration_scale'] = duration_scale
     randomize_initial_state(metadata, settings, rng)
+
+    # Optional uniform spatial scaling, sampled last to preserve older seeds.
+    # This changes route dimensions, not reconstructed surfaces or obstacles.
+    if 'route_size_scale' in settings:
+        size_scale = float(sample_uniform(settings, rng, 'route_size_scale', [1., 1.]))
+        if size_scale <= 0:
+            raise ValueError('route_size_scale must be positive')
+        for key in ('width_m', 'height_m', 'a_m', 'b_m', 'radius_m'):
+            if key in task:
+                task[key] *= size_scale
+        metadata['route_size_scale'] = size_scale
+
+    if model == 'quadrotor':
+        for axis in ('roll', 'pitch'):
+            name = f'initial_{axis}_offset_deg'
+            if name in settings:
+                metadata[name] = float(sample_uniform(settings, rng, name, [0., 0.]))
 
     return task, vehicle, metadata

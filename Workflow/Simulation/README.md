@@ -2,15 +2,16 @@
 
 The default action is **collective thrust (N) + XYZ body rates (rad/s)**.
 The current configuration uses a 0.6×0.6 m horizontal figure eight at Z=1.2 m,
-30-second nominal/minimum duration, and velocity-aligned heading. Physical/task
-randomization is implemented; visual appearance and scene-geometry
-randomization and student training remain future work.
+30-second nominal/minimum duration, and velocity-aligned heading. Physical/task randomization is implemented. The optional large-collection profile
+also varies route size and RGB appearance; scene-object geometry randomization
+and student training remain future work.
 
 ## Choose the workflow
 
 | Task | Guide |
 | --- | --- |
 | Run custom browser / native Isaac viewer | [START_HERE.md](START_HERE.md) |
+| Collect about a million pairs in resumable batches | [LARGE_COLLECTION.md](LARGE_COLLECTION.md) |
 | Collect full PhysX demonstrations | [isaac_sim/NATIVE_BACKEND.md](isaac_sim/NATIVE_BACKEND.md#run-native-isaac-collection) |
 | Collect with the custom simulator | [DATA_COLLECTION.md](DATA_COLLECTION.md) |
 | Browse, download, audit and visualize results | [RESULTS.md](RESULTS.md) |

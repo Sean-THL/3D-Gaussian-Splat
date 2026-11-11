@@ -10,6 +10,7 @@ quadrotor simulation → synchronized RGB/thrust-body-rate demonstrations.
 | [Project map](Workflow/PROJECT_MAP.md) | Exact recording, COLMAP inputs/outputs, final Gaussian model, Vicon alignment, code ownership and current status |
 | [Named scene assets](data/scene_20261025_200034/organized/README.md) | Stage-based shortcuts to the original data, final PLY/checkpoint and result folders |
 | [Run the simulators](Workflow/Simulation/START_HERE.md) | Local/custom browser and native Isaac launches |
+| [Dataset versions and pilot review](Workflow/Simulation/DATASET_VERSIONS.md) | Frozen campaign settings and a separate folder for the first three episodes |
 | [Collect with native Isaac](Workflow/Simulation/isaac_sim/NATIVE_BACKEND.md#run-native-isaac-collection) | Full rigid-body demonstrations and physics checks |
 | [Browse/download results](Workflow/Simulation/RESULTS.md) | Remote SFTP, transfer and offline videos/plots |
 
@@ -67,5 +68,6 @@ git clone --recurse-submodules https://github.com/Sean-THL/3D-Gaussian-Splat.git
 ```
 
 The current system collects demonstrations; a student network/trainer,
-visual appearance randomization and validated real-flight deployment remain
-future work. See the project map for precise implementation boundaries.
+validated real-flight deployment remain future work.
+A [large collection campaign](Workflow/Simulation/LARGE_COLLECTION.md) now adds
+route-size variation, RGB appearance augmentation, resumable batches and split indexes. See the project map for precise implementation boundaries.

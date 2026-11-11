@@ -44,7 +44,10 @@ class Simulator:
         if initial_position[2] <= self.vehicle.floor or min(p[2] for p in self.route.polyline(401)) <= self.vehicle.floor:
             raise ValueError('Sampled route/initial position crosses the assumed floor; revise randomization bounds')
         initial_yaw = self.route.yaw_reference(0.)[0]+np.deg2rad(sampled['initial_yaw_offset_deg'])
-        self.state = State(initial_position, np.asarray(sampled['initial_velocity_m_s']), Rotation.from_euler('z', initial_yaw))
+        initial_roll_pitch = np.deg2rad([sampled.get('initial_roll_offset_deg', 0.),
+                                        sampled.get('initial_pitch_offset_deg', 0.)])
+        self.state = State(initial_position, np.asarray(sampled['initial_velocity_m_s']),
+            Rotation.from_euler('xyz', [*initial_roll_pitch, initial_yaw]))
         self.controller = (LinearMPC(self.config.get('mpc', {}), self.config['vehicle'], self.control_dt)
                            if self.controller_type == 'mpc' else
                            IntegratorTracker(self.config['controller']) if self.is_integrator else TrackingController(self.config['controller']))

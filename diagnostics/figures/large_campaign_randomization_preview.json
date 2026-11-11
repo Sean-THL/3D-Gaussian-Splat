@@ -1,0 +1,925 @@
+{
+  "seed": 100000,
+  "episodes": [
+    {
+      "seed": 100000,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.07481305081587374,
+          -0.0062928515301683
+        ],
+        "width_m": 1.192741298034364,
+        "height_m": 1.192741298034364,
+        "altitude_m": 1.2995058959358938,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": 9.606239847100213,
+        "hover_seconds": 1.0,
+        "duration_s": 30.379452456444554,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8889318744529925,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.09206838171981141,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.057388939608637765,
+        "thrust_time_constant_s": 0.049989811663889744,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9407022570783211,
+        "rate_scale": 1.0185555041442622,
+        "acceleration_disturbance_m_s2": [
+          -0.07549393917821023,
+          -0.06305477299900428,
+          0.0027520253010090423
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          0.021893314131615403,
+          0.01108335253223832,
+          0.023344094172033987
+        ],
+        "initial_velocity_m_s": [
+          -0.0217290976646968,
+          -0.0025413885817800047,
+          -0.028695479643475626
+        ],
+        "initial_yaw_offset_deg": -2.079049726433644,
+        "route_offset_m": [
+          -0.07481305081587374,
+          -0.0062928515301683,
+          0.09950589593589385
+        ],
+        "duration_scale": 1.0126484152148185,
+        "route_size_scale": 1.9879021633906064
+      }
+    },
+    {
+      "seed": 100001,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.07037004886397413,
+          0.07548493097106931
+        ],
+        "width_m": 0.6452100636271222,
+        "height_m": 0.6452100636271222,
+        "altitude_m": 1.1082302519090927,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -9.39889560091671,
+        "hover_seconds": 1.0,
+        "duration_s": 36.61479981873815,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.818088929007798,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.15362654182172078,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.021621164402947087,
+        "thrust_time_constant_s": 0.03178401788751605,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9781787089952847,
+        "rate_scale": 0.9836546376532589,
+        "acceleration_disturbance_m_s2": [
+          -0.015322531560668345,
+          0.024302504027899713,
+          0.010125829664573288
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.0078012307203607495,
+          -0.019980632700556496,
+          0.015393200930221278
+        ],
+        "initial_velocity_m_s": [
+          -0.024822587211206795,
+          0.007338605353842814,
+          0.025979685184034644
+        ],
+        "initial_yaw_offset_deg": 4.642832573045535,
+        "route_offset_m": [
+          0.07037004886397413,
+          0.07548493097106931,
+          -0.09176974809090731
+        ],
+        "duration_scale": 1.2204933272912717,
+        "route_size_scale": 1.0753501060452038
+      }
+    },
+    {
+      "seed": 100002,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.08881129415745548,
+          0.03451486226017736
+        ],
+        "width_m": 1.4661346758846763,
+        "height_m": 1.4661346758846763,
+        "altitude_m": 1.2258163375865596,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -2.8609583225865283,
+        "hover_seconds": 1.0,
+        "duration_s": 47.40917597052536,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8143041108527258,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.10469577126053098,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.03443074394366648,
+        "thrust_time_constant_s": 0.02278688012701977,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9699890070925072,
+        "rate_scale": 0.9577994635788988,
+        "acceleration_disturbance_m_s2": [
+          -0.08397432310258038,
+          0.0899500296221829,
+          0.09899299688670335
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.024201127143083208,
+          -0.012110493850361035,
+          0.003438879664545695
+        ],
+        "initial_velocity_m_s": [
+          0.029189235485595613,
+          -0.026174729914573744,
+          0.010843778484418934
+        ],
+        "initial_yaw_offset_deg": -0.14230423697529915,
+        "route_offset_m": [
+          0.08881129415745548,
+          0.03451486226017736,
+          0.025816337586559712
+        ],
+        "duration_scale": 1.5803058656841786,
+        "route_size_scale": 2.443557793141127
+      }
+    },
+    {
+      "seed": 100003,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.09542967479983151,
+          0.047327949560394295
+        ],
+        "width_m": 1.600638511346623,
+        "height_m": 1.600638511346623,
+        "altitude_m": 1.2188567259267793,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": 0.4240164161970785,
+        "hover_seconds": 1.0,
+        "duration_s": 49.764868142707364,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8797879946971398,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.20431750502379598,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.033056393330799745,
+        "thrust_time_constant_s": 0.043130404531352744,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 1.0263672552573222,
+        "rate_scale": 1.0640772695640328,
+        "acceleration_disturbance_m_s2": [
+          -0.03358353708162465,
+          0.047206413405175784,
+          0.017715589804773196
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.009044883992491523,
+          0.016733286072162262,
+          -0.0126866956942795
+        ],
+        "initial_velocity_m_s": [
+          0.010793868568259507,
+          -0.019228970086070565,
+          0.022540396784675794
+        ],
+        "initial_yaw_offset_deg": 2.559026056325467,
+        "route_offset_m": [
+          -0.09542967479983151,
+          0.047327949560394295,
+          0.01885672592677945
+        ],
+        "duration_scale": 1.6588289380902455,
+        "route_size_scale": 2.6677308522443717
+      }
+    },
+    {
+      "seed": 100004,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.0959613865835795,
+          0.027339906307348616
+        ],
+        "width_m": 0.6741192585840582,
+        "height_m": 0.6741192585840582,
+        "altitude_m": 1.116923890817061,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": 3.7210477279116034,
+        "hover_seconds": 1.0,
+        "duration_s": 35.94959524945729,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.9613884490836883,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.22698255933543204,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.030877744455851668,
+        "thrust_time_constant_s": 0.03662520460464948,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9903225448412205,
+        "rate_scale": 0.9049567733891983,
+        "acceleration_disturbance_m_s2": [
+          0.07515922315975149,
+          -0.007048143596711881,
+          -0.0015988148405746694
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.01613933551261721,
+          0.009052204954402988,
+          0.029669974259010204
+        ],
+        "initial_velocity_m_s": [
+          0.0009255424443198462,
+          -0.024317737351727094,
+          -0.004079623376777433
+        ],
+        "initial_yaw_offset_deg": -4.4398486037346885,
+        "route_offset_m": [
+          -0.0959613865835795,
+          0.027339906307348616,
+          -0.08307610918293913
+        ],
+        "duration_scale": 1.1983198416485763,
+        "route_size_scale": 1.123532097640097
+      }
+    },
+    {
+      "seed": 100005,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.0005621604022272575,
+          0.06365237214382133
+        ],
+        "width_m": 0.7650326321981921,
+        "height_m": 0.7650326321981921,
+        "altitude_m": 1.1063442648093167,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -1.64267149211609,
+        "hover_seconds": 1.0,
+        "duration_s": 46.77089392210285,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8596006634545907,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.21199023374262183,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.04028820877958197,
+        "thrust_time_constant_s": 0.047948300244853484,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9210648838721477,
+        "rate_scale": 0.939938298702349,
+        "acceleration_disturbance_m_s2": [
+          0.06257966704837362,
+          0.05965988730770974,
+          0.03567463214619079
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.009788253099198632,
+          0.021279185167549362,
+          -0.002275958890520343
+        ],
+        "initial_velocity_m_s": [
+          -0.0105155004185144,
+          -0.02079575774337701,
+          -0.0004909803413969821
+        ],
+        "initial_yaw_offset_deg": 0.6199109200938446,
+        "route_offset_m": [
+          0.0005621604022272575,
+          0.06365237214382133,
+          -0.09365573519068322
+        ],
+        "duration_scale": 1.5590297974034284,
+        "route_size_scale": 1.2750543869969868
+      }
+    },
+    {
+      "seed": 100006,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.026309226932813512,
+          0.018992915101428753
+        ],
+        "width_m": 1.5814575539466722,
+        "height_m": 1.5814575539466722,
+        "altitude_m": 1.1411677317566926,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": 7.264445388205157,
+        "hover_seconds": 1.0,
+        "duration_s": 42.350923070580095,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.945139075572757,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.1515153308611277,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.024559586132028396,
+        "thrust_time_constant_s": 0.037167393243821525,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9438186852571062,
+        "rate_scale": 0.9455304725563254,
+        "acceleration_disturbance_m_s2": [
+          0.015275948457695865,
+          0.037480865970528604,
+          -0.08586586857077733
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          0.009297864591955009,
+          -0.0019360354775306947,
+          -0.025381837899051185
+        ],
+        "initial_velocity_m_s": [
+          -0.01172624207659716,
+          -0.02431188383656411,
+          0.02143386932359452
+        ],
+        "initial_yaw_offset_deg": -4.000606716475941,
+        "route_offset_m": [
+          0.026309226932813512,
+          0.018992915101428753,
+          -0.05883226824330734
+        ],
+        "duration_scale": 1.411697435686003,
+        "route_size_scale": 2.6357625899111206
+      }
+    },
+    {
+      "seed": 100007,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.052780394520733,
+          0.0860403156718422
+        ],
+        "width_m": 1.8346158424470087,
+        "height_m": 1.8346158424470087,
+        "altitude_m": 1.1118798457478496,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -8.722311509218663,
+        "hover_seconds": 1.0,
+        "duration_s": 33.89073249961623,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8494171278490852,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.16544903306027225,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.03066233461090551,
+        "thrust_time_constant_s": 0.037013857358347335,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.9741439050640375,
+        "rate_scale": 0.9759193996013975,
+        "acceleration_disturbance_m_s2": [
+          0.05352997420550115,
+          -0.008224425597165658,
+          0.09124214825312019
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.018452611207959397,
+          0.018934498846599243,
+          0.027541428550255036
+        ],
+        "initial_velocity_m_s": [
+          -0.009266033623111021,
+          0.007100010228855397,
+          -0.005395762275932921
+        ],
+        "initial_yaw_offset_deg": -4.56086273357875,
+        "route_offset_m": [
+          -0.052780394520733,
+          0.0860403156718422,
+          -0.08812015425215035
+        ],
+        "duration_scale": 1.129691083320541,
+        "route_size_scale": 3.0576930707450147
+      }
+    },
+    {
+      "seed": 100008,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.09507390577027108,
+          5.2228766825576645e-05
+        ],
+        "width_m": 1.5388604340704621,
+        "height_m": 1.5388604340704621,
+        "altitude_m": 1.1724721269043363,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -5.1519408839984155,
+        "hover_seconds": 1.0,
+        "duration_s": 46.3237458509262,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.7708873202422913,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.21658487023745443,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.04841347047521137,
+        "thrust_time_constant_s": 0.03237662252105439,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 0.916901029008335,
+        "rate_scale": 0.9287962152259005,
+        "acceleration_disturbance_m_s2": [
+          0.00888402432463116,
+          -0.07744502731511177,
+          0.07964586502877344
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          0.003001772264159243,
+          -0.02106679704063974,
+          -0.012069622978917428
+        ],
+        "initial_velocity_m_s": [
+          0.006731160012496899,
+          -0.02764465546632594,
+          -0.015741079441374498
+        ],
+        "initial_yaw_offset_deg": -4.647941706463117,
+        "route_offset_m": [
+          0.09507390577027108,
+          5.2228766825576645e-05,
+          -0.027527873095663694
+        ],
+        "duration_scale": 1.54412486169754,
+        "route_size_scale": 2.564767390117437
+      }
+    },
+    {
+      "seed": 100009,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.0035300429664750083,
+          0.01499409262600479
+        ],
+        "width_m": 1.387325987619191,
+        "height_m": 1.387325987619191,
+        "altitude_m": 1.1361874405343388,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -10.91576550539143,
+        "hover_seconds": 1.0,
+        "duration_s": 39.78431859617965,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8123471046808816,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.11526177917183014,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.03475382205321865,
+        "thrust_time_constant_s": 0.027136097943086704,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 1.089179768943797,
+        "rate_scale": 1.073149965266989,
+        "acceleration_disturbance_m_s2": [
+          -0.05128942628672102,
+          0.05761424070435425,
+          0.015452962965191636
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          0.026535155898792344,
+          0.008029065519145562,
+          0.021661973010031532
+        ],
+        "initial_velocity_m_s": [
+          -0.02265053986644698,
+          0.008803021390618941,
+          -0.010821583842058911
+        ],
+        "initial_yaw_offset_deg": 1.8060235888479053,
+        "route_offset_m": [
+          -0.0035300429664750083,
+          0.01499409262600479,
+          -0.06381255946566114
+        ],
+        "duration_scale": 1.3261439532059884,
+        "route_size_scale": 2.3122099793653184
+      }
+    },
+    {
+      "seed": 100010,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          0.09505309760215461,
+          -0.05711712382673098
+        ],
+        "width_m": 1.64573921206838,
+        "height_m": 1.64573921206838,
+        "altitude_m": 1.2681748222460847,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -6.760011723830644,
+        "hover_seconds": 1.0,
+        "duration_s": 34.645273520680426,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8609804013603968,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.11996340026290292,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.028778445846924242,
+        "thrust_time_constant_s": 0.020701239914374638,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 1.0403314263979266,
+        "rate_scale": 1.0001578771160458,
+        "acceleration_disturbance_m_s2": [
+          -0.08229772332003996,
+          0.08427126756337008,
+          -0.08920230215643957
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          0.018208934284239302,
+          -0.02185502717699108,
+          0.0008413489100991683
+        ],
+        "initial_velocity_m_s": [
+          -0.017432188013734688,
+          -0.0292717815724503,
+          0.00625097469538493
+        ],
+        "initial_yaw_offset_deg": -0.9267631341364115,
+        "route_offset_m": [
+          0.09505309760215461,
+          -0.05711712382673098,
+          0.06817482224608482
+        ],
+        "duration_scale": 1.1548424506893475,
+        "route_size_scale": 2.7428986867806335
+      }
+    },
+    {
+      "seed": 100011,
+      "task": {
+        "trajectory_type": "lissajous_figure8",
+        "center_xy_m": [
+          -0.07922779259685037,
+          0.004023088396023791
+        ],
+        "width_m": 1.5667126299498872,
+        "height_m": 1.5667126299498872,
+        "altitude_m": 1.1162394110717444,
+        "speed_m_s": 0.3,
+        "max_acceleration_m_s2": 0.5,
+        "yaw_deg": -14.891254209343781,
+        "hover_seconds": 1.0,
+        "duration_s": 42.72362575867734,
+        "minimum_duration_s": 30.0,
+        "vertical_drop_m": 0.0,
+        "max_angular_speed_rad_s": 0.75,
+        "angular_ramp_rate_per_s": 0.1,
+        "yaw_mode": "velocity_aligned"
+      },
+      "plant": {
+        "rotation_model": "rigid_body",
+        "rigid_body_max_step_s": 0.001,
+        "mass_kg": 0.8836676017075281,
+        "gravity_m_s2": 9.81,
+        "linear_drag_per_s": 0.11940420992685444,
+        "max_thrust_to_weight": 2.5,
+        "max_body_rate_rad_s": 4.0,
+        "floor_z_m": 0.0,
+        "max_speed_m_s": 1.0,
+        "max_acceleration_m_s2": 2.0,
+        "rate_time_constant_s": 0.02941579761930524,
+        "thrust_time_constant_s": 0.0313433601447055,
+        "inertia_kg_m2": [
+          0.0049,
+          0.0049,
+          0.0088
+        ],
+        "max_body_torque_nm": [
+          0.3,
+          0.3,
+          0.15
+        ],
+        "max_thrust_n": 21.336750000000002,
+        "thrust_scale": 1.0882398261374422,
+        "rate_scale": 1.0809533371438342,
+        "acceleration_disturbance_m_s2": [
+          0.09903430643952763,
+          0.06391239055664116,
+          0.0627288713871472
+        ]
+      },
+      "randomization": {
+        "enabled": true,
+        "initial_position_offset_m": [
+          -0.026311260518587655,
+          0.0017346344370568756,
+          -0.010035748161227463
+        ],
+        "initial_velocity_m_s": [
+          0.009010243680539813,
+          0.016287364686013307,
+          0.0026523475495201787
+        ],
+        "initial_yaw_offset_deg": -1.058539073119542,
+        "route_offset_m": [
+          -0.07922779259685037,
+          0.004023088396023791,
+          -0.08376058892825565
+        ],
+        "duration_scale": 1.4241208586225782,
+        "route_size_scale": 2.6111877165831454
+      }
+    }
+  ],
+  "highlighted_seeds": [
+    100000,
+    100003,
+    100011
+  ],
+  "config": "Workflow/Simulation/configs/large_collection.json",
+  "config_sha256": "11b301dbc82a31cfe72f0da08ab7a72ff62cf3fd77f69945a71a723ea6b09ffb",
+  "description": "Actual randomization samples and reference functions; no MPC or learned-policy rollouts"
+}

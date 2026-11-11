@@ -225,9 +225,9 @@ remote run uses them.
 
 Current randomization includes route translation/yaw/timing, initial errors,
 mass, drag, rate/thrust gain and time constants, and acceleration bias.
-Route-size sampling, appearance/noise/lighting augmentation, and scene-geometry
-randomization remain unimplemented. More poses do not by themselves implement
-appearance randomization. Room obstacles currently affect visuals, not collisions.
+The optional `large_collection.json` profile adds uniform route-size sampling and
+RGB brightness/color/gamma/blur/noise augmentation. Scene-object geometry
+randomization and physical relighting remain unimplemented. Room obstacles currently affect visuals, not collisions.
 
 ## 7. Collection, results and visualization
 
@@ -281,8 +281,12 @@ Completed: recording extraction, COLMAP, confirmed Gaussian model, fidelity
 evaluation, candidate alignment, custom/native simulation, thrust/body-rate
 expert, physical/task randomization, paired collection and visualization.
 
-Before claiming a complete sim-to-real training system: implement visual and
-additional geometric randomization, build the student loader/network/training
+For high-volume data, use [the large campaign guide](Simulation/LARGE_COLLECTION.md)
+and `Simulation/collect_campaign.py`; it provides seed splits, audits and resume.
+
+Before claiming a complete sim-to-real training system: validate the new
+augmentation/profile on native GPU rollouts, add physical scene-geometry
+randomization if required, build the student loader/network/training
 loop, define splits and closed-loop evaluation, independently measure mount/
 body frames and hardware dynamics, and validate the deployment command interface.
 No trained student or real-drone command bridge exists yet.

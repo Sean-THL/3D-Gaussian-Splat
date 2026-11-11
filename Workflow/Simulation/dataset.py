@@ -36,6 +36,9 @@ class DemonstrationRecorder:
         self.images.mkdir(exist_ok=True)
         self.renderer = renderer
         self.count = 0
+        self.visual_randomizer = None
+        self.image_format = 'png'
+        self.jpeg_quality = 95
         self.stream = (self.output/'rgb_actions.jsonl').open('w')
         self.metadata = dict(schema_version=1, image_timing='pre-action, same state as expert decision',
             state_frame='Vicon world Z-up; quaternion body-to-world XYZW',
@@ -48,12 +51,27 @@ class DemonstrationRecorder:
         from PIL import Image
         rgb, _ = self.renderer.render(sim.state)
         if self.count == 0:
+            storage = sim.config.get('dataset_storage', {})
+            self.image_format = storage.get('image_format', 'png').lower()
+            self.jpeg_quality = int(storage.get('jpeg_quality', 95))
+            if self.image_format not in ('png', 'jpeg') or not 1 <= self.jpeg_quality <= 100:
+                raise ValueError('Dataset image_format must be png/jpeg and JPEG quality 1–100')
+            self.metadata['image_encoding'] = dict(format=self.image_format,
+                jpeg_quality=self.jpeg_quality if self.image_format == 'jpeg' else None,
+                lossy=self.image_format == 'jpeg')
+            from Workflow.Simulation.visual_randomization import VisualRandomizer
+            self.visual_randomizer = VisualRandomizer(sim.config.get('visual_randomization', {}),
+                sim.config.get('seed', 42), sim.config.get('randomization', {}).get('enabled', False))
+            self.metadata['visual_randomization'] = self.visual_randomizer.metadata
             self.metadata.update(control_dt_s=sim.control_dt, image_resolution_wh=[rgb.shape[1], rgb.shape[0]],
                 action_limits=dict(max_thrust_n=sim.controller.max_thrust, max_body_rate_rad_s=sim.controller.max_rate),
                 physics_backend=sim.snapshot().get('physics_backend', 'custom_quadrotor'))
             (self.output/'dataset_metadata.json').write_text(json.dumps(self.metadata, indent=2)+'\n')
-        relative = Path('rgb')/f'{self.count:06d}.png'
-        Image.fromarray(rgb).save(self.output/relative)
+        rgb = self.visual_randomizer.apply(rgb)
+        extension = 'jpg' if self.image_format == 'jpeg' else 'png'
+        relative = Path('rgb')/f'{self.count:06d}.{extension}'
+        options = dict(quality=self.jpeg_quality, subsampling=0) if self.image_format == 'jpeg' else {}
+        Image.fromarray(rgb).save(self.output/relative, **options)
         return dict(time_s=sim.time, position_m=sim.state.position.tolist(),
                     quaternion_xyzw=sim.state.orientation.as_quat().tolist(),
                     image=str(relative), image_sha256=hashlib.sha256((self.output/relative).read_bytes()).hexdigest())

@@ -106,6 +106,11 @@ for the custom server. It shares WebRTC port 49100 with the native viewer.
 
 ## Configuration and collection
 
+For approximately a million pairs with split indexes and resumable native batches,
+see [LARGE_COLLECTION.md](LARGE_COLLECTION.md).
+Before starting that campaign, use [DATASET_VERSIONS.md](DATASET_VERSIONS.md)
+to freeze a version and inspect its first three episodes separately.
+
 The default custom-simulator profile is now `configs/quadrotor_nmpc.json`:
 custom rigid-body dynamics with thrust/body-rate NMPC. Use
 `--quadrotor-plant rate_response` for the earlier simplified custom model.

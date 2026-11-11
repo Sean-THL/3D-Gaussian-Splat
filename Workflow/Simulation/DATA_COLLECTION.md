@@ -9,13 +9,15 @@ Use `--quadrotor-plant rate_response` for the earlier simplified response model.
 NMPC outputs collective thrust in newtons and XYZ body rates in radians/second.
 The 3DGUT renderer uses the achieved position and orientation, including tilt.
 Randomization samples task offsets, heading, duration, initial errors, and
-physical response parameters once per episode. Appearance randomization is
-not implemented. The camera mount/alignment remains provisional.
+physical response parameters once per episode. Appearance augmentation is available in the optional
+[large campaign profile](LARGE_COLLECTION.md); the ordinary profile leaves it disabled. The camera mount/alignment remains provisional.
 
 The native Isaac backend is also available; see
 [NATIVE_BACKEND.md](isaac_sim/NATIVE_BACKEND.md). The standalone A-to-B
 linear-MPC/geometric-controller experiment is retained in `animate_ab_flight.py`;
 that experimental combination is not wired into the RGB dataset collector.
+
+For high-volume collection with resumable batches, use [LARGE_COLLECTION.md](LARGE_COLLECTION.md).
 
 ## 1. Prepare the remote shell
 
