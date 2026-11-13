@@ -66,6 +66,10 @@ class DemonstrationRecorder:
             self.metadata.update(control_dt_s=sim.control_dt, image_resolution_wh=[rgb.shape[1], rgb.shape[0]],
                 action_limits=dict(max_thrust_n=sim.controller.max_thrust, max_body_rate_rad_s=sim.controller.max_rate),
                 physics_backend=sim.snapshot().get('physics_backend', 'custom_quadrotor'))
+            if sim.state.motor_speeds_rad_s is not None:
+                self.metadata['motor_state']=dict(units='rad/s',count=4,
+                    max_motor_speed_rad_s=sim.vehicle.parameters.max_motor_speed,
+                    role='actual simulated rotor speeds; privileged diagnostic, not required student input')
             (self.output/'dataset_metadata.json').write_text(json.dumps(self.metadata, indent=2)+'\n')
         rgb = self.visual_randomizer.apply(rgb)
         extension = 'jpg' if self.image_format == 'jpeg' else 'png'

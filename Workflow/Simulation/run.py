@@ -243,8 +243,8 @@ def headless(app, duration, record):
     video = None
     recorder = None
     if sim.config.get('record_rgb_actions', False):
-        if renderer is None or sim.controller_type != 'nmpc':
-            raise ValueError('--dataset requires Gaussian rendering and thrust/body-rate NMPC')
+        if renderer is None or sim.controller_type not in ('nmpc','mpc_geometric'):
+            raise ValueError('--dataset requires Gaussian rendering and a thrust/body-rate expert')
         from Workflow.Simulation.dataset import DemonstrationRecorder
         recorder = DemonstrationRecorder(app.output, renderer)
     if record:
@@ -304,10 +304,10 @@ def main():
     parser.add_argument('--no-render', action='store_true', help='CPU dynamics only; no Gaussian image')
     parser.add_argument('--dynamics', choices=['single_integrator', 'double_integrator', 'quadrotor'],
                         help='Override the configured vehicle model')
-    parser.add_argument('--quadrotor-plant', choices=['rate_response', 'rigid_body'],
+    parser.add_argument('--quadrotor-plant', choices=['rate_response', 'rigid_body','upstream_motor'],
                         help='Custom quadrotor rotation: response approximation or force/torque rigid body')
     parser.add_argument('--yaw-mode', choices=['constant', 'velocity_aligned'], help='Reference heading mode')
-    parser.add_argument('--controller', choices=['baseline', 'mpc', 'nmpc'], help='Reference tracking controller')
+    parser.add_argument('--controller', choices=['baseline', 'mpc', 'nmpc','mpc_geometric'], help='Reference tracking controller')
     parser.add_argument('--randomize', action='store_true', help='Sample task and plant settings on each reset')
     parser.add_argument('--seed', type=int, help='Randomization seed')
     parser.add_argument('--episodes', type=int, default=1, help='Number of headless episodes, with seeds seed+i')
@@ -356,12 +356,15 @@ def main():
     if args.seed is not None:
         config['seed'] = args.seed
     config['record_rgb_actions'] = args.dataset
-    if args.dataset and config['controller'].get('type') != 'nmpc':
-        parser.error('--dataset currently requires --controller nmpc with --dynamics quadrotor')
+    if args.dataset and config['controller'].get('type') not in ('nmpc','mpc_geometric'):
+        parser.error('--dataset requires nmpc or mpc_geometric with quadrotor dynamics')
     if config.get('controller', {}).get('type', 'baseline') == 'mpc' and config.get('dynamics_model') != 'double_integrator':
         parser.error('MPC requires double_integrator. Use --controller baseline for other dynamics.')
     if config.get('controller', {}).get('type') == 'nmpc' and config.get('dynamics_model') != 'quadrotor':
         parser.error('NMPC requires --dynamics quadrotor.')
+    if config.get('controller',{}).get('type')=='mpc_geometric' and (
+            config.get('dynamics_model')!='quadrotor' or config['vehicle'].get('rotation_model')!='upstream_motor'):
+        parser.error('mpc_geometric requires quadrotor dynamics and upstream_motor plant; use configs/motor_mpc.json.')
     if config.get('randomization', {}).get('enabled') and config.get('dynamics_model') not in ('double_integrator', 'quadrotor'):
         parser.error('Randomization supports double_integrator or quadrotor.')
     output = args.output or ROOT/'data/scene_20261025_200034/simulation'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')

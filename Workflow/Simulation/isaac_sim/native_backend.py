@@ -97,6 +97,8 @@ class NativeSimulator(Simulator):
     def __init__(self, config, world):
         if config.get('dynamics_model') != 'quadrotor':
             raise ValueError('Native backend requires quadrotor dynamics')
+        if config['vehicle'].get('rotation_model')=='upstream_motor':
+            raise ValueError('upstream_motor uses the pinned NumPy RK4 model; launch the custom run.sh, not native PhysX')
         self.world = world
         super().__init__(config)
 

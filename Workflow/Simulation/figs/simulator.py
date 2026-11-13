@@ -20,13 +20,17 @@ class Simulator:
             raise ValueError(f'Unknown dynamics_model: {self.dynamics_model}')
         self.is_integrator = self.dynamics_model != 'quadrotor'
         self.controller_type = config.get('controller', {}).get('type', 'baseline')
-        if self.controller_type not in ('baseline', 'mpc', 'nmpc'):
-            raise ValueError('controller.type must be baseline, mpc, or nmpc')
-        self.is_expert = self.controller_type in ('mpc', 'nmpc')
+        if self.controller_type not in ('baseline', 'mpc', 'nmpc', 'mpc_geometric'):
+            raise ValueError('controller.type must be baseline, mpc, nmpc, or mpc_geometric')
+        self.is_expert = self.controller_type in ('mpc', 'nmpc', 'mpc_geometric')
         if self.controller_type == 'mpc' and self.dynamics_model != 'double_integrator':
             raise ValueError('MPC currently requires --dynamics double_integrator; use --controller baseline for other models')
         if self.controller_type == 'nmpc' and self.dynamics_model != 'quadrotor':
             raise ValueError('NMPC requires --dynamics quadrotor')
+        if self.controller_type == 'mpc_geometric' and (self.is_integrator or config['vehicle'].get('rotation_model')!='upstream_motor'):
+            raise ValueError('mpc_geometric requires the upstream_motor quadrotor plant')
+        if config['vehicle'].get('rotation_model')=='upstream_motor' and self.controller_type=='baseline':
+            raise ValueError('Use mpc_geometric or nmpc with the upstream_motor plant')
         self.physics_dt = 1/float(config['physics_hz'])
         self.control_dt = 1/float(config['control_hz'])
         self.substeps = round(self.control_dt/self.physics_dt)
@@ -48,15 +52,22 @@ class Simulator:
                                         sampled.get('initial_pitch_offset_deg', 0.)])
         self.state = State(initial_position, np.asarray(sampled['initial_velocity_m_s']),
             Rotation.from_euler('xyz', [*initial_roll_pitch, initial_yaw]))
+        if hasattr(self.vehicle,'initialize_motor_state'):
+            self.state=self.vehicle.initialize_motor_state(self.state)
         self.controller = (LinearMPC(self.config.get('mpc', {}), self.config['vehicle'], self.control_dt)
                            if self.controller_type == 'mpc' else
                            IntegratorTracker(self.config['controller']) if self.is_integrator else TrackingController(self.config['controller']))
         if self.controller_type == 'nmpc':
             from Workflow.Simulation.control.quadrotor_mpc import QuadrotorMPC
             self.controller = QuadrotorMPC(self.config.get('nmpc', {}), self.config['vehicle'], self.control_dt, self.physics_dt)
+        if self.controller_type == 'mpc_geometric':
+            from Workflow.Simulation.control.mpc_geometric import LinearMPCGeometric
+            self.controller=LinearMPCGeometric(self.config.get('mpc',{}),self.config['vehicle'],
+                self.config.get('geometric_controller',{}),self.control_dt)
         self.episode_parameters = dict(episode=self.episode+1, seed=self.config.get('seed', 42),
                                        task=task, plant=plant, randomization=sampled,
-                                       expert_model={'mpc': 'nominal ideal double integrator', 'nmpc': 'nominal thrust/body-rate quadrotor', 'baseline': 'baseline feedback'}[self.controller_type])
+                                       expert_model={'mpc': 'nominal ideal double integrator', 'nmpc': 'nominal thrust/body-rate quadrotor',
+                                        'mpc_geometric':'nominal ideal double integrator + upstream geometric conversion','baseline': 'baseline feedback'}[self.controller_type])
         self.episode_parameters['physics_backend'] = getattr(self.vehicle, 'physics_backend',
             'custom_'+self.dynamics_model)
         self.time, self.route_time = 0., 0.
@@ -89,12 +100,19 @@ class Simulator:
                 reference_horizon=refs.tolist(), horizon_dt_s=self.control_dt,
                 solver=dict(self.controller.diagnostics))
             demonstration['observed_body_rates_rad_s'] = (self.state.body_rates.tolist() if self.state.body_rates is not None else [0., 0., 0.])
-            if self.controller_type == 'nmpc':
+            if self.controller_type in ('nmpc','mpc_geometric'):
                 demonstration.update(action_type='thrust_body_rates', action_thrust_n=action,
                                      action_body_rates_rad_s=rotation_action.tolist())
             else:
                 demonstration.update(action_type='acceleration_yaw_rate', action_acceleration_m_s2=action.tolist(),
                                      action_yaw_rate_rad_s=rotation_action)
+            if self.state.motor_speeds_rad_s is not None:
+                demonstration['observed_motor_speeds_rad_s']=self.state.motor_speeds_rad_s.tolist()
+                demonstration['observed_aerodynamic_thrust_n']=self.state.actuator_thrust_n
+            if self.controller_type=='mpc_geometric':
+                demonstration['outer_acceleration_m_s2']=self.controller.acceleration_command.tolist()
+                demonstration['outer_yaw_rate_rad_s']=self.controller.yaw_rate_command
+                demonstration['geometric_requested_wrench_n_nm']=self.controller.requested_wrench.tolist()
             self.demonstrations.append(demonstration)
         else:
             action, rotation_action = self.controller.command(
@@ -133,6 +151,9 @@ class Simulator:
         self.telemetry[-1].update(controller=self.controller_type,
             mpc_solve_ms=self.controller.diagnostics['solve_ms'] if self.is_expert else None,
             mpc_status=self.controller.diagnostics['status'] if self.is_expert else None)
+        if self.state.motor_speeds_rad_s is not None:
+            self.telemetry[-1].update({f'motor_{i+1}_rad_s':value for i,value in enumerate(self.state.motor_speeds_rad_s)})
+            self.telemetry[-1]['motor_saturation_steps']=self.vehicle.motor_saturation_steps
         self.telemetry = self.telemetry[-20000:]
 
     def command(self, command):
@@ -244,6 +265,9 @@ class Simulator:
         if model == 'rigid_body':
             from Workflow.Simulation.figs.rigid_body import RigidBodyQuadrotor
             return RigidBodyQuadrotor(plant)
+        if model == 'upstream_motor':
+            from Workflow.Simulation.figs.motor_model import MotorQuadrotor
+            return MotorQuadrotor(plant,self.config['vehicle'],self.config.get('geometric_controller',{}))
         if model != 'rate_response':
-            raise ValueError('vehicle.rotation_model must be rate_response or rigid_body')
+            raise ValueError('vehicle.rotation_model must be rate_response, rigid_body, or upstream_motor')
         return Quadrotor(plant)

@@ -36,6 +36,11 @@ def audit_episode(folder):
         vector = np.r_[row['position_m'], row['velocity_m_s'], row['quaternion_xyzw'], row['action_thrust_n'], row['action_body_rates_rad_s'], time]
         if not np.isfinite(vector).all() or abs(np.linalg.norm(row['quaternion_xyzw'])-1) > 1e-5:
             raise ValueError('Nonfinite data or invalid quaternion')
+        if 'observed_motor_speeds_rad_s' in row:
+            motors=np.asarray(row['observed_motor_speeds_rad_s'],dtype=float)
+            maximum=metadata['motor_state']['max_motor_speed_rad_s']
+            if motors.shape!=(4,) or not np.isfinite(motors).all() or np.min(motors)<0 or np.max(motors)>maximum+1e-6:
+                raise ValueError('Invalid actual motor state')
         references = np.asarray(row['reference_horizon'], dtype=float)
         if references.ndim != 2 or references.shape[1] != 11 or len(references) < 3 or not np.isfinite(references).all():
             raise ValueError('Invalid reference horizon')

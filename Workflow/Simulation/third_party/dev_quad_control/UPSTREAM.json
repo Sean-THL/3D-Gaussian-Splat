@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/tkkim-robot/dev-quad-control-pipeline",
+  "commit": "010185660dba317c2b471bd47d1d6bf94f7cebf6",
+  "upstream_deployed_source_commit": "dc78ff9a14736644c068013e0a9166e3d9acd2d7",
+  "retrieved_date": "2026-11-12",
+  "license": "MIT",
+  "adaptation": "Vendored module equations/integrator unchanged. Project-specific mapping and command conversion live outside this directory.",
+  "sha256": {
+    "LICENSE": "89cdf47767702254fe3a5663f861643309acca92fa2c99dc845625064d4166f3",
+    "PROVENANCE.md": "d58ed2c3f7e9d3d5ccdcae77c5e6d2f6757b801e3575069a6332a371bfdeffc5",
+    "fixtures/deployed_reference.json": "bf6c3942cbecd84c62fe068ac9a9128d5a79e557137584930b3b45449b713ce0",
+    "quadrotor.py": "0084a9e26f743655dcbe959dc438317626271fcbd10afb2858fb969a7b189878"
+  }
+}

@@ -25,8 +25,13 @@ def file_hash(path):
 
 def create_version(config_path, destination, pilot_episodes=3, pilot_seed=90000000, parent=None):
     config = json.loads(config_path.read_text())
-    if config.get('dynamics_model')!='quadrotor' or config.get('controller',{}).get('type')!='nmpc':
-        raise ValueError('Use the quadrotor thrust/body-rate NMPC configuration')
+    if config.get('dynamics_model')!='quadrotor' or config.get('controller',{}).get('type') not in ('nmpc','mpc_geometric'):
+        raise ValueError('Use a quadrotor thrust/body-rate expert configuration')
+    backend=config.get('collection_backend','native')
+    if backend not in ('native','custom_motor'):
+        raise ValueError('collection_backend must be native or custom_motor')
+    if backend=='native' and config.get('controller',{}).get('type')!='nmpc':
+        raise ValueError('mpc_geometric motor dynamics currently use collection_backend=custom_motor')
     if pilot_episodes<1 or pilot_seed<0:
         raise ValueError('Pilot episode count must be positive and seed nonnegative')
     if destination.exists():
@@ -39,7 +44,7 @@ def create_version(config_path, destination, pilot_episodes=3, pilot_seed=900000
         path = resolve_training_asset(ROOT, config['rendering'][name])
         assets[name] = dict(configured_path=config['rendering'][name],sha256=file_hash(path))
     sources = {str(p.relative_to(ROOT)):p for p in sorted((ROOT/'Workflow/Simulation').rglob('*'))
-               if p.is_file() and p.suffix in ('.py','.sh','.json','.html')}
+               if p.is_file() and (p.suffix in ('.py','.sh','.json','.html','.md') or p.name in ('LICENSE','NOTICE'))}
     destination.mkdir(parents=True)
     frozen = destination/'config.json'
     frozen.write_text(json.dumps(config,indent=2)+'\n')
@@ -54,6 +59,7 @@ def create_version(config_path, destination, pilot_episodes=3, pilot_seed=900000
         version=json.loads((parent/'version.json').read_text())['version'])
     metadata = dict(schema_version=1,version=destination.name,created_utc=datetime.now(timezone.utc).isoformat(),
         status='prepared_not_collected',parent=parent_record,config_sha256=file_hash(frozen),assets=assets,
+        collection_backend=backend,
         source_git_commit=git.stdout.strip() if git.returncode==0 else None,
         source_worktree_dirty=bool(status.stdout.strip()),
         source_sha256={relative:file_hash(path) for relative,path in sources.items()},
@@ -70,6 +76,9 @@ def create_version(config_path, destination, pilot_episodes=3, pilot_seed=900000
             'camera_mount_and_tilt_plausible','trajectory_and_altitude_as_intended',
             'augmentation_acceptable','tracking_and_expert_actions_acceptable']},
         notes='Do not treat a structural audit as a geometry-fidelity or sim-to-real pass.')
+    if backend=='custom_motor':
+        review['checks'].pop('native_report_passed')
+        review['checks']['full_motor_model_validated']=None
     (pilot/'reviews/review_template.json').write_text(json.dumps(review,indent=2)+'\n')
     command = '''#!/usr/bin/env bash
 set -euo pipefail
@@ -99,17 +108,18 @@ for name,asset in metadata['assets'].items():
             digest.update(chunk)
     if digest.hexdigest()!=asset['sha256']:
         raise SystemExit('Frozen model/calibration asset changed: '+name)
-url=os.environ.get('RENDER_URL','http://127.0.0.1:8766')
-if urlparse(url).scheme!='http' or urlparse(url).hostname not in ('127.0.0.1','localhost','::1'):
-    raise SystemExit('Use a localhost HTTP renderer URL.')
-with urlopen(url.rstrip('/')+'/health',timeout=10) as response:
-    renderer=json.load(response)
-for name,key in [('checkpoint','checkpoint_sha256'),('alignment','alignment_sha256')]:
-    if renderer[key]!=metadata['assets'][name]['sha256']:
-        raise SystemExit('Running renderer does not match version asset: '+name)
 config=json.loads((root/'config.json').read_text())
-if [renderer['width'],renderer['height']]!=[config['rendering']['width'],config['rendering']['height']]:
-    raise SystemExit('Running renderer resolution differs from the version configuration.')
+if metadata.get('collection_backend','native')=='native':
+    url=os.environ.get('RENDER_URL','http://127.0.0.1:8766')
+    if urlparse(url).scheme!='http' or urlparse(url).hostname not in ('127.0.0.1','localhost','::1'):
+        raise SystemExit('Use a localhost HTTP renderer URL.')
+    with urlopen(url.rstrip('/')+'/health',timeout=10) as response:
+        renderer=json.load(response)
+    for name,key in [('checkpoint','checkpoint_sha256'),('alignment','alignment_sha256')]:
+        if renderer[key]!=metadata['assets'][name]['sha256']:
+            raise SystemExit('Running renderer does not match version asset: '+name)
+    if [renderer['width'],renderer['height']]!=[config['rendering']['width'],config['rendering']['height']]:
+        raise SystemExit('Running renderer resolution differs from the version configuration.')
 PY
 run_output="$version_root/pilot_test/runs/run_$(date -u +%Y%m%dT%H%M%SZ)_$RANDOM"
 bash Workflow/Simulation/isaac_sim/run_native.sh \\
@@ -119,6 +129,11 @@ bash Workflow/Simulation/isaac_sim/run_native.sh \\
   --output "$run_output"
 echo "PILOT_OUTPUT=$run_output"
 '''.replace('PILOT_SEED',str(pilot_seed)).replace('PILOT_EPISODES',str(pilot_episodes))
+    if backend=='custom_motor':
+        command=command.replace('bash Workflow/Simulation/isaac_sim/run_native.sh','bash Workflow/Simulation/run.sh')
+        command=command.replace('--config "$version_root/config.json" --checks --randomize',
+            '--config "$version_root/config.json" --headless --dataset --randomize')
+        command=command.replace('  --render-url "${RENDER_URL:-http://127.0.0.1:8766}" \\\n','')
     launcher = pilot/'run_pilot.sh'
     launcher.write_text(command)
     launcher.chmod(0o755)
@@ -142,6 +157,11 @@ tracking. Compare representative rendered views against recorded RGB/depth at
 matched poses. Repeated views from the same reconstruction are not independent
 real-world validation. Do not start bulk collection merely because audits pass.
 ''')
+    if backend=='custom_motor':
+        text=(pilot/'README.md').read_text().replace('Start the Gaussian renderer first. Then, from the repository root with Conda\ndeactivated, run',
+            'The custom runner loads its own Gaussian renderer. From the repository root, run')
+        text=text.replace('starting native physics','starting the full motor/RK4 physics')
+        (pilot/'README.md').write_text(text)
     (destination/'README.md').write_text(f'''# {destination.name}
 
 Status: prepared, no episodes collected by this setup command.

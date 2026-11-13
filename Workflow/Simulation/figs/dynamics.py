@@ -17,6 +17,7 @@ class State:
     orientation: Rotation
     body_rates: np.ndarray = None
     actuator_thrust_n: float = None
+    motor_speeds_rad_s: np.ndarray = None
 
 
 class Quadrotor:

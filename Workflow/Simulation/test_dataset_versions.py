@@ -55,5 +55,22 @@ class DatasetVersionTests(unittest.TestCase):
                 versions.create_version(cfg,destination)
             self.assertFalse(destination.exists())
 
+    def test_custom_motor_launcher_and_license_are_preserved(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);cfg,config=self.prepare(root)
+            config.update(collection_backend='custom_motor',controller=dict(type='mpc_geometric'))
+            cfg.write_text(json.dumps(config))
+            license_path=root/'Workflow/Simulation/third_party/model/LICENSE'
+            license_path.parent.mkdir(parents=True);license_path.write_text('MIT test license')
+            destination=root/'campaigns/motor_v2'
+            with patch.object(versions,'ROOT',root):
+                metadata=versions.create_version(cfg,destination)
+            command=(destination/'pilot_test/run_pilot.sh').read_text()
+            self.assertEqual(metadata['collection_backend'],'custom_motor')
+            self.assertIn('bash Workflow/Simulation/run.sh',command)
+            self.assertIn('--headless --dataset --randomize',command)
+            self.assertNotIn('--render-url',command)
+            self.assertTrue((destination/'source_snapshot'/license_path.relative_to(root)).is_file())
+
 
 if __name__=='__main__':unittest.main()

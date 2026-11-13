@@ -1,0 +1,51 @@
+[
+  {
+    "run": "cuda_rgb_short/summary.json",
+    "simulated_seconds": 1.0000000000000002,
+    "position_error_rms_m": 5.475235590478635e-05,
+    "position_error_max_m": 7.637674285911858e-05,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "nominal_short/summary.json",
+    "simulated_seconds": 2.9999999999999973,
+    "position_error_rms_m": 5.603553829235387e-05,
+    "position_error_max_m": 7.63763228668801e-05,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "randomized/episode_0001/summary.json",
+    "simulated_seconds": 44.199999999999626,
+    "position_error_rms_m": 0.01221068691697686,
+    "position_error_max_m": 0.03999229499137555,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "randomized/episode_0002/summary.json",
+    "simulated_seconds": 40.24999999999985,
+    "position_error_rms_m": 0.09448321651164925,
+    "position_error_max_m": 0.09531896417758869,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "randomized/episode_0003/summary.json",
+    "simulated_seconds": 34.0500000000002,
+    "position_error_rms_m": 0.08020146709502099,
+    "position_error_max_m": 0.08111680695271944,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "velocity_aligned/summary.json",
+    "simulated_seconds": 32.00000000000032,
+    "position_error_rms_m": 0.00026007072349884487,
+    "position_error_max_m": 0.0005922187951933636,
+    "mpc_failed_solves": 0
+  },
+  {
+    "run": "constant_yaw/summary.json",
+    "simulated_seconds": 32.00000000000032,
+    "position_error_rms_m": 0.0002557513490146458,
+    "position_error_max_m": 0.0005840884106659019,
+    "mpc_failed_solves": 0
+  }
+]

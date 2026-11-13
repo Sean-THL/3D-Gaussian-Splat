@@ -126,6 +126,20 @@ def randomize_quadrotor_dynamics(vehicle, settings, rng):
     vehicle['acceleration_disturbance_m_s2'] = sample_uniform(settings, rng, 'acceleration_bias_m_s2', [-.1, .1], size=3).tolist()
 
 
+def randomize_motor_dynamics(vehicle, settings, rng):
+    """Actual motor-model parameters; no conversion of 1/s linear damping to quadratic drag."""
+    vehicle['mass_kg']*=float(sample_uniform(settings,rng,'mass_scale',[.85,1.15]))
+    inertia=np.asarray(vehicle['inertia_kg_m2'])*sample_uniform(settings,rng,'inertia_scale',[.9,1.1],size=3)
+    vehicle['inertia_kg_m2']=inertia.tolist()
+    vehicle['motor_time_constant_s']=float(sample_uniform(settings,rng,'motor_time_constant_s',[.015,.03]))
+    vehicle['motor_thrust_coefficient']*=float(sample_uniform(settings,rng,'thrust_coefficient_scale',[.9,1.1]))
+    vehicle['motor_torque_coefficient']*=float(sample_uniform(settings,rng,'torque_coefficient_scale',[.9,1.1]))
+    vehicle['quadratic_drag_kg_per_m']=float(sample_uniform(settings,rng,'quadratic_drag_kg_per_m',[.05,.15]))
+    vehicle['quadratic_angular_drag_nm_s2']=float(sample_uniform(settings,rng,'quadratic_angular_drag_nm_s2',[.001,.005]))
+    vehicle['wind_velocity_m_s']=sample_uniform(settings,rng,'wind_velocity_m_s',[-.3,.3],size=3).tolist()
+    vehicle['acceleration_disturbance_m_s2']=sample_uniform(settings,rng,'acceleration_bias_m_s2',[-.05,.05],size=3).tolist()
+
+
 def sample_episode(config, rng):
     """Return (episode task, actual vehicle parameters, episode metadata).
 
@@ -155,7 +169,9 @@ def sample_episode(config, rng):
 
     # Sample in this order to preserve the results associated with existing seeds.
     route_offset, duration_scale = randomize_task(task, settings, rng)
-    if model == 'quadrotor':
+    if model == 'quadrotor' and vehicle.get('rotation_model')=='upstream_motor':
+        randomize_motor_dynamics(vehicle,settings,rng)
+    elif model == 'quadrotor':
         randomize_quadrotor_dynamics(vehicle, settings, rng)
     else:
         randomize_dynamics(vehicle, settings, rng)

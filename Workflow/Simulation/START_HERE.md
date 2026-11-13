@@ -1,5 +1,9 @@
 # Run the two simulators
 
+For the supplied `dev-quad-control-pipeline` motor dynamics with simplified
+position/yaw MPC, use [MOTOR_MPC.md](MOTOR_MPC.md). That profile runs the custom
+motor/RK4 plant; the native Isaac workflow below uses its separate PhysX plant.
+
 To browse or download completed runs and generate result videos/trajectory plots,
 see [RESULTS.md](RESULTS.md).
 
